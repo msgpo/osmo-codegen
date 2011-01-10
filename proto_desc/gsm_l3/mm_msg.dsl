@@ -45,10 +45,10 @@ pdu_spec cm_reest_req
 	msg_type		mand	V	1	val 0x28
 	cksn			mand	V4u
 	spare			mand	V4l
-	classmark2		mand	LV	4
-	mobile_id		mand	LV	2-9
+	classmark2		mand	LV	4				ie ms_classmark2
+	mobile_id		mand	LV	2-9				ie mobile_id
 	# this IE is conditional on mobile_id being of type TMSI
-	location_area_id	cond	TV	6		tag 0x13
+	location_area_id	cond	TV	6		tag 0x13	ie location_area_id
 end_pdu_spec
 
 # 9.2.5 CM service accept
@@ -96,8 +96,8 @@ pdu_spec cm_service_req
 	msg_type		mand	V	1	val 0x24
 	cm_serv_type		mand	V4u
 	cksn			mand	V4l
-	classmark2		mand	LV	4
-	mobile_id		mand	LV	2-9
+	classmark2		mand	LV	4				ie ms_classmark2
+	mobile_id		mand	LV	2-9				ie mobile_id
 	mm_priority		mand	TV4			tag 0x80
 end_pdu_spec
 
@@ -115,7 +115,7 @@ pdu_spec mm_identity_resp
 	proto_disc		mand	V4u		val 5
 	skip_ind		mand	V4l
 	msg_type		mand	V	1	val 0x19
-	mobile_id		mand	LV	2-10
+	mobile_id		mand	LV	2-10				ie mobile_id
 end_pdu_spec
 
 # 9.2.12 IMSI detach indication
@@ -123,8 +123,8 @@ pdu_spec mm_imsi_det_ind
 	proto_disc		mand	V4u		val 5
 	skip_ind		mand	V4l
 	msg_type		mand	V	1	val 0x01
-	classmark1		mand	V	1
-	mobile_id		mand	LV	2-9
+	classmark1		mand	V	1				ie ms_classmark1
+	mobile_id		mand	LV	2-9				ie mobile_id
 end_pdu_spec
 
 # 9.2.13 Location updating accept
@@ -132,8 +132,8 @@ pdu_spec mm_loc_upd_acc
 	proto_disc		mand	V4u		val 5
 	skip_ind		mand	V4l
 	msg_type		mand	V	1	val 0x02
-	location_area_id	mand	V	5
-	mobile_id		opt	TLV	310		tag 0x17
+	location_area_id	mand	V	5				ie location_area_id
+	mobile_id		opt	TLV	310		tag 0x17	ie mobile_id
 	follow_on_proceed	opt	T			tag 0xa1
 	cts_permission		opt	T			tag 0xa2
 	equivalent_plmns	opt	TLV	5-47		tag 0x4a
@@ -155,9 +155,9 @@ pdu_spec mm_loc_upd_req
 	msg_type		mand	V	1	val 0x08
 	loc_upd_type		mand	V4u
 	cksn			mand	V4l
-	location_area_id	mand	V	5
-	classmark1		mand	V	1
-	mobile_id		mand	LV	2-9
+	location_area_id	mand	V	5				ie location_area_id
+	classmark1		mand	V	1				ie ms_classmark1
+	mobile_id		mand	LV	2-9				ie mobile_id
 	umts_classmark2		opt	TLV	5		tag 0x33
 end_pdu_spec
 
@@ -166,10 +166,10 @@ pdu_spec mm_info
 	proto_disc		mand	V4u		val 5
 	skip_ind		mand	V4l
 	msg_type		mand	V	1	val 0x32
-	mm_net_name_full	opt	TLV	3-255		tag 0x43
-	mm_net_name_short	opt	TLV	3-255		tag 0x45
+	mm_net_name_full	opt	TLV	3-255		tag 0x43	ie mm_network_name
+	mm_net_name_short	opt	TLV	3-255		tag 0x45	ie mm_network_name
 	mm_time_zone		opt	TV	2		tag 0x46
-	mm_nitz			opt	TV	8		tag 0x47
+	mm_nitz			opt	TV	8		tag 0x47	ie mm_nitz
 	lsa_id			opt	TLV	2-5		tag 0x48
 	daylight_saving_time	opt	TLV	3		tag 0x49
 end_pdu_spec
@@ -187,8 +187,8 @@ pdu_spec mm_tmsi_reall_cmd
 	proto_disc		mand	V4u		val 5
 	skip_ind		mand	V4l
 	msg_type		mand	V	1	val 0x1a
-	location_are_id		mand	V	5
-	mobile_id		mand	LV	2-9
+	location_are_id		mand	V	5				ie location_area_id
+	mobile_id		mand	LV	2-9				ie mobile_id
 end_pdu_spec
 
 # 9.2.18 TMSI reallocation complete

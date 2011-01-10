@@ -5,7 +5,7 @@ ie_spec cell_identity
 end_ie_spec
 
 # 10.5.1.3 Location Area ID
-ie_spec la_id
+ie_spec location_area_id
 	mcc			3	bcd
 	mnc			3	bcd
 	lac			16	bit	big
@@ -13,7 +13,6 @@ end_ie_spec
 
 # 10.5.1.4 Mobile ID
 ie_spec mobile_id
-	content_len		8	bit
 	type			3	bit
 	odd_even_ind		1	bit
 	identity_digit		*	bcd
@@ -30,7 +29,6 @@ end_ie_spec
 
 # 10.5.1.6 MS Classmark 2
 ie_spec ms_classmark2
-	content_len		8	bit
 	rf_pwr_capa		3	bit
 	a51			1	bit
 	es_ind			1	bit

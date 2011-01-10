@@ -55,8 +55,12 @@ pdu_field_size
 	:	NUMERIC ('-' NUMERIC)? ;
 
 pdu_field_opts
-	:	('uplink_only' | 'downlink_only')
+	:	pdu_up_downlink | pdu_opt_ie
 	;
+pdu_up_downlink
+	:	'uplink_only' | 'downlink_only';
+pdu_opt_ie
+	:	'ie' ID;
 
 pdu_field_type
 	:	(

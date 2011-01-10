@@ -1,7 +1,6 @@
 
 # 10.5.4.4 Auxiliary states
 ie_spec cc_auxiliary_states
-	content_len		1	byte
 	mpty_aux_state		2	bits
 	hold_aux_state		2	bits
 	spare			3	bits	val 0
@@ -13,7 +12,6 @@ end_ie_spec
 
 # 10.5.4.5a CC capabilities
 ie_spec cc_capabilities
-	content_len		1	byte
 	dtmf			1	bit
 	pcp			1	bit
 	enicm			1	bit
@@ -66,7 +64,6 @@ ie_alias cc_calling_party_subaddr cc_called_party_subaddr
 
 # 10.5.4.11 Cause
 ie_spec cc_cause
-	content_len		1	byte
 	location		4	bit
 	spare			1	bit	val 0
 	coding_standard		2	bit
@@ -92,7 +89,6 @@ ie_alias cc_connected_party_subaddr cc_called_party_subaddr
 
 # 10.5.4.16 Higher layer compatibility
 ie_spec cc_high_layer_compat
-	content_len		1	byte
 	pres_method		2	bit
 	interpretation		3	bit
 	ext1			1	bit	val 1
@@ -109,7 +105,6 @@ end_ie_spec
 
 # 10.5.4.21 Progress ind
 ie_spec cc_progress_ind
-	content_len		1	byte
 	location		3	bit
 	spare			1	bit	val 0
 	coding_standard		2	bit
@@ -131,7 +126,6 @@ ie_alias cc_redir_party_subaddr		cc_calling_party_subaddr
 # 10.5.4.24 SS Version ind: no need
 # 10.5.4.25 User-user
 ie_spec cc_user_user
-	content_len		1	byte
 	pdisc			1	byte
 	info			*	byte
 end_ie_spec

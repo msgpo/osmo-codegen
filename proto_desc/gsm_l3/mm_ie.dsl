@@ -9,7 +9,7 @@
 # 10.5.3.5 Location updating type: no need (TV4)
 
 # 10.5.3.5a Network Name
-ie_spec network_name
+ie_spec mm_network_name
 	num_spare_bits		3	bit
 	add_ci			1	bit
 	coding_scheme		3	bit
@@ -21,7 +21,7 @@ end_ie_spec
 # 10.5.3.7 Follow on proceed: no need (single byte)
 # 10.5.3.8 Time Zone: no need (single byte)
 # 10.6.3.9 Time Zone and Time
-ie_spec nitz
+ie_spec mm_nitz
 	year			2	bcd
 	month			2	bcd
 	day			2	bcd
