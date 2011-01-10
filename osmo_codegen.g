@@ -25,6 +25,10 @@ field_tag
 field_size
 	:	NUMERIC ('-' NUMERIC)? ;
 
+field_opts
+	:	('uplink_only' | 'downlink_only')
+	;
+
 field_type
 	:	(
 		('V4u' 	field_val?)
@@ -35,7 +39,7 @@ field_type
 	|	('TV'	field_size 	field_val? field_tag)
 	|	('T'			field_val? field_tag)
 	|	('TV4'			field_val? field_tag)
-	);
+	) field_opts*;
 	
 field_def 
 	: ID field_mode field_type;
