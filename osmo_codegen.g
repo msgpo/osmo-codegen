@@ -6,7 +6,10 @@ grammar osmo_codegen;
 root	:	
 	  (pdu_spec | ie_spec | ie_alias)*
 	;
+	
+/* INFORMATION ELEMENTS */
 
+/* An alias in the form "ie_alias new_name existing_field" */
 ie_alias:	'ie_alias' ie_name ie_name;
 
 ie_name	:	ID;
@@ -23,18 +26,27 @@ ie_field_def
 ie_field_name
 	:	ID;
 ie_field_len
-	:	(NUMERIC | '*');
+	:	(NUMERIC
+		| '*'		// * only permitted in last field, menas 'all remaining octets/bits'
+		);
 ie_field_type
-	:	('byte' | 'bytes' | 'bit' | 'bits' | 'bcd');
+	:	('byte' | 'bytes'
+		| 'bit' | 'bits'
+		| 'bcd'		// BCD digits, always 'lower nibble, upper nibble, lower nibble, ...
+		);
 ie_field_opts
 	:	field_val? ie_field_cond? ie_field_endian?;
 ie_field_cond
-	:	'if (' ie_field_name COMP_OP NUMERIC ')';
+	:	'if (' ie_field_name ('&' ie_field_cond_mask)? COMP_OP ie_field_cond_reference ')';
+ie_field_cond_mask
+	:	NUMERIC;
+ie_field_cond_reference
+	:	NUMERIC;
 ie_field_endian
 	:	('big' | 'little');
 
 
-/* PDU */
+/* PDU DEFINITIONS*/
 
 pdu_spec
 	: 	'pdu_spec' ID 
@@ -46,32 +58,32 @@ pdu_field_mode
 	:	'mand' | 'opt' | 'cond';
 
 field_val
-	:	('val'|'value') NUMERIC;
+	:	('val'|'value') NUMERIC;	// Field always has to have indicated value
 
 field_tag
-	:	'tag' NUMERIC;
+	:	'tag' NUMERIC;			// for tagged fields
 
 pdu_field_size
-	:	NUMERIC ('-' NUMERIC)? ;
+	:	NUMERIC ('-' NUMERIC)? ;	// fixed length or range
 
 pdu_field_opts
 	:	pdu_up_downlink | pdu_opt_ie
 	;
 pdu_up_downlink
-	:	'uplink_only' | 'downlink_only';
+	:	'uplink_only' | 'downlink_only'; // only valid in uplink or downlink
 pdu_opt_ie
-	:	'ie' ID;
+	:	'ie' ID;			// use speciifed IE definition
 
 pdu_field_type
 	:	(
-		('V4u' 			field_val?)
-	|	('V4l' 			field_val?)
-	|	('V' 	pdu_field_size 	field_val?)
-	|	('TLV' 	pdu_field_size? field_val? field_tag)
-	|	('LV' 	pdu_field_size 	field_val?)
-	|	('TV'	pdu_field_size 	field_val? field_tag)
-	|	('T'			field_val? field_tag)
-	|	('TV4'			field_val? field_tag)
+		('V4u' 			field_val?)		// 4 bits in the upper nibble
+	|	('V4l' 			field_val?)		// 4 bits in the lower nibble
+	|	('V' 	pdu_field_size 	field_val?)		// 8bit value-only
+	|	('TLV' 	pdu_field_size? field_val? field_tag)	// full TLV
+	|	('LV' 	pdu_field_size 	field_val?)		// LV without Tag
+	|	('TV'	pdu_field_size 	field_val? field_tag)	// TV with fixed length value
+	|	('T'			field_val? field_tag)	// T only
+	|	('TV4'			field_val? field_tag)	// T is upper nibble, value lower nibble
 	) pdu_field_opts*;
 	
 pdu_field_def 
