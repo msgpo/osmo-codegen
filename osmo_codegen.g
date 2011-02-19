@@ -1,26 +1,44 @@
 grammar osmo_codegen;
 
-//options {
+options {
 	//language = Python;
-//}
+	output = AST;
+}
+tokens {
+	PDUFIELD_OPT;
+	FIELD_VAL;
+	PDUFIELD_SIZE;
+	IEFIELD_ENDIAN;
+	IEFIELD_COND;
+	
+	IE_SPECS;
+	IE_ALIASES;
+	PDU_SPECS;
+}
+
 root	:	
 	  (pdu_spec | ie_spec | ie_alias)*
+	  				-> ^(IE_SPECS ie_spec*) ^(IE_ALIASES ie_alias*) ^(PDU_SPECS pdu_spec*)
 	;
 	
 /* INFORMATION ELEMENTS */
 
 /* An alias in the form "ie_alias new_name existing_field" */
-ie_alias:	'ie_alias' ie_name ie_name;
+ie_alias:	'ie_alias' ie_name ie_name
+					-> ^(ie_name ie_name)
+	;
 
 ie_name	:	ID;
 
 ie_spec	:	'ie_spec' ID
 			ie_field_def*
 		'end_ie_spec'
+					-> ^(ID ie_field_def*)
 		;
 
 ie_field_def
-	:	ie_field_name ie_field_len ie_field_type ie_field_opts
+	:	ie_field_name ie_field_len ie_field_type ie_field_opt*
+					-> ^(ie_field_name ie_field_type ie_field_len ie_field_opt*)
 	;
 
 ie_field_name
@@ -34,16 +52,22 @@ ie_field_type
 		| 'bit' | 'bits'
 		| 'bcd'		// BCD digits, always 'lower nibble, upper nibble, lower nibble, ...
 		);
-ie_field_opts
-	:	field_val? ie_field_cond? ie_field_endian?;
+ie_field_opt
+	:	(field_val | ie_field_cond | ie_field_endian)
+	;
 ie_field_cond
-	:	'if (' ie_field_name ('&' ie_field_cond_mask)? COMP_OP ie_field_cond_reference ')';
+	:	'if (' ie_field_name ('&' ie_field_cond_mask)? COMP_OP ie_field_cond_reference ')'
+					-> ^(IEFIELD_COND ie_field_name ie_field_cond_mask? COMP_OP ie_field_cond_reference)
+	;
 ie_field_cond_mask
 	:	NUMERIC;
 ie_field_cond_reference
 	:	NUMERIC;
 ie_field_endian
-	:	('big' | 'little');
+	:	( 'big'			-> ^(IEFIELD_ENDIAN 'big')
+		| 'little'		-> ^(IEFIELD_ENDIAN 'little')
+		)
+	;
 
 
 /* PDU DEFINITIONS*/
@@ -51,20 +75,26 @@ ie_field_endian
 pdu_spec
 	: 	'pdu_spec' ID 
 			pdu_field_def*
-		'end_pdu_spec'
+		'end_pdu_spec'		-> ^(ID pdu_field_def*)
 	;
 
 pdu_field_mode
 	:	'mand' | 'opt' | 'cond';
 
 field_val
-	:	('val'|'value') NUMERIC;	// Field always has to have indicated value
+	:	('val'|'value') NUMERIC		// Field always has to have indicated value
+					-> ^(FIELD_VAL NUMERIC)
+	;
 
 field_tag
-	:	'tag' NUMERIC;			// for tagged fields
+	:	'tag' NUMERIC			// for tagged fields
+					-> ^('tag' NUMERIC)
+	;
 
 pdu_field_size
-	:	NUMERIC ('-' NUMERIC)? ;	// fixed length or range
+	:	NUMERIC ('-' NUMERIC)?	 	// fixed length or range
+					-> ^(PDUFIELD_SIZE NUMERIC*)
+	;
 
 pdu_field_opts
 	:	pdu_up_downlink | pdu_opt_ie
@@ -72,7 +102,9 @@ pdu_field_opts
 pdu_up_downlink
 	:	'uplink_only' | 'downlink_only'; // only valid in uplink or downlink
 pdu_opt_ie
-	:	'ie' ID;			// use speciifed IE definition
+	:	'ie' ID				// use speciifed IE definition
+					-> ^('ie' ID)
+	;
 
 pdu_field_type
 	:	(
@@ -87,7 +119,9 @@ pdu_field_type
 	) pdu_field_opts*;
 	
 pdu_field_def 
-	: ID pdu_field_mode pdu_field_type;
+	: ID pdu_field_mode pdu_field_type
+						-> ^(ID pdu_field_mode pdu_field_type)
+	;
 	
 
 /* LEXER RULES */
