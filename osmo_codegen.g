@@ -18,7 +18,9 @@ tokens {
 
 root	:	
 	  (pdu_spec | ie_spec | ie_alias)*
-	  				-> ^(IE_SPECS ie_spec*) ^(IE_ALIASES ie_alias*) ^(PDU_SPECS pdu_spec*)
+	  				-> ^(IE_SPECS ie_spec*) 
+	  				   ^(IE_ALIASES ie_alias*)
+	  				   ^(PDU_SPECS pdu_spec*)
 	;
 	
 /* INFORMATION ELEMENTS */
@@ -53,7 +55,7 @@ ie_field_type
 		| 'bcd'		// BCD digits, always 'lower nibble, upper nibble, lower nibble, ...
 		);
 ie_field_opt
-	:	(field_val | ie_field_cond | ie_field_endian)
+	:	(field_val | ie_field_cond | ie_field_endian | ie_field_enum)
 	;
 ie_field_cond
 	:	'if (' ie_field_name ('&' ie_field_cond_mask)? COMP_OP ie_field_cond_reference ')'
@@ -68,7 +70,10 @@ ie_field_endian
 		| 'little'		-> ^(IEFIELD_ENDIAN 'little')
 		)
 	;
-
+ie_field_enum
+	:	'enum' ID		-> ^('enum' ID)
+	;
+	
 
 /* PDU DEFINITIONS*/
 
@@ -97,13 +102,17 @@ pdu_field_size
 	;
 
 pdu_field_opts
-	:	pdu_up_downlink | pdu_opt_ie
+	:	pdu_up_downlink | pdu_opt_ie | pdu_opt_enum
 	;
 pdu_up_downlink
 	:	'uplink_only' | 'downlink_only'; // only valid in uplink or downlink
 pdu_opt_ie
 	:	'ie' ID				// use speciifed IE definition
 					-> ^('ie' ID)
+	;
+pdu_opt_enum
+	:	'enum' ID
+					-> ^('enum' ID)
 	;
 
 pdu_field_type
