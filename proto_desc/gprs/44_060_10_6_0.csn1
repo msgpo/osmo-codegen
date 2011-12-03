@@ -4534,6 +4534,11 @@ sub-clause 1.6.
    < ARFCN_INDEX : bit (6) >
    { 0 | 1 < ARFCN index list struct > } ;
 
+-- 12.11
+< Packet Request Reference IE > ::=
+   < RANDOM_ACCESS_INFORMATION value : bit (11) >
+   < FRAME_NUMBER : bit (16) > ;
+
 -- 12.12
 < Packet Timing Advance IE > ::=
    { 0 | 1 < TIMING_ADVANCE_VALUE : bit (6) > }
