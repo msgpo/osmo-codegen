@@ -1,0 +1,487 @@
+--- gsm_44_060_10_6_0_msgs.src.orig	2011-12-03 21:50:30.000000000 +0100
++++ gsm_44_060_10_6_0_msgs.src	2011-12-03 22:36:56.000000000 +0100
+@@ -25,7 +25,7 @@
+    < MESSAGE_TYPE : bit (6) == 0 10000 > < Multiple TBF Uplink Assignment message content > |
+    < MESSAGE_TYPE : bit (6) == 0 10001 > < Multiple TBF Timeslot Reconfigure message content > |
+    < MESSAGE_TYPE : bit (6) == 0 10011 > < MBMS MS_ID Assignment message content > | -- PACCH only
+-   < MESSAGE_TYPE : bit (6) == 0 10100 > < MBMS Assignment (Non-distribution) message content > |
++   < MESSAGE_TYPE : bit (6) == 0 10100 > < MBMS Assignment Non-distribution message content > |
+    < MESSAGE_TYPE : bit (6) == 0 10101 > < PS Handover Command message content > |                     -- PACCH only
+    < MESSAGE_TYPE : bit (6) == 0 10110 > < Packet Physical Information message content > | -- PACCH only
+    < MESSAGE_TYPE : bit (6) == 0 10111 > < DTM Handover Command message content > | -- PACCH only
+@@ -49,7 +49,7 @@
+    < MESSAGE_TYPE : bit (6) == 1 00000 > < Packet Serving Cell SI message content > |
+    < MESSAGE_TYPE : bit (6) == 1 00111 > < Packet CS Command message content > |
+    < MESSAGE_TYPE : bit (6) == 1 01001 > < Packet CS Release Indication message content > |
+-   < MESSAGE_TYPE : bit (6) == 1 01010 > < MBMS Assignment (Distribution) message content > |
++   < MESSAGE_TYPE : bit (6) == 1 01010 > < MBMS Assignment Distribution message content > |
+    < MESSAGE_TYPE : bit (6) == 1 01011 > < MBMS Neighbouring Cell Information message content >|
+    < MESSAGE_TYPE : bit (6) == 1 01100 > < Packet MBMS Announcement message content >
+    < MESSAGE_TYPE : bit (6) == 1 01101 > < Packet Application Information message content >
+@@ -191,7 +191,7 @@
+          |1
+             < E-UTRAN CSG Target Cell Measurement Report : < E-UTRAN CSG Measurement Report IE > > }
+         { 0 | 1 < E-UTRAN CCN Measurement Report : < E-UTRAN CCN Measurement Report struct > > }
+-   ! < Message escape : { 1111 } bit (*) = <no string> > }
++   ! < Message escape : { 1111 } bit (*) = <no string> >
+    { 0< BA_USED : bit > | 1 < PSI3_CHANGE_MARK : bit(2) > }
+    < PMO_USED : bit >
+    < PCCN_SENDING : bit (1) >
+@@ -226,7 +226,7 @@
+ < 3G CCN Measurement Report Struct > ::=                    -- Measurement Report for 3G neighbour cells
+    < N_3G: bit (3) >
+    { < 3G_CELL_LIST_INDEX : bit (7) >
+-       < REPORTING_QUANTITY : bit (6) > } * (val(N_3G + 1 )) ;
++       < REPORTING_QUANTITY : bit (6) > } * (val(N_3G) + 1) ;
+ 
+ < E-UTRAN Target Cell struct > ::=
+    < EARFCN : bit (16) >
+@@ -239,7 +239,7 @@
+    < N_E-UTRAN: bit (2) >
+    { < E-UTRAN_FREQUENCY_INDEX : bit (3) >
+       < CELL IDENTITY : bit (9) >
+-      < REPORTING_QUANTITY : bit (6) > } * (val(N_E-UTRAN + 1 )) ;
++      < REPORTING_QUANTITY : bit (6) > } * (val(N_E-UTRAN) + 1) ;
+ 
+ -- 11.2.4
+ < Packet Cell Change Order message content > ::=
+@@ -347,7 +349,7 @@
+    < PRIORITY_CLASS : bit (3) >
+    < HCS_THR : bit (5) > ;
+ 
+-< ENH Measurement parameters struct > :: =
++< ENH Measurement parameters struct > ::=
+    { 0 < BA_IND : bit > < 3G_BA_IND : bit > | 1 < PSI3_CHANGE_MARK : bit(2) > }
+    < PMO_IND : bit >
+    < REPORT_TYPE : bit >
+@@ -432,7 +433,7 @@
+ 
+ < CCN Support Description struct > ::=
+     < Number_Cells : bit (7) >
+-    { CCN_SUPPORTED : bit } * (val(Number_Cells)) ;
++    < CCN_SUPPORTED : bit > * (val(Number_Cells)) ;
+ 
+ < Iu Mode Neighbour Cell Params struct > ::=
+     { 0 | 1 < Iu Mode Cell Selection Params : <Iu Mode Cell Selection struct > > }
+@@ -723,19 +698,19 @@
+         { 0 | 1 < Channel Request Description : < Channel Request Description IE > >}
+         { 0 | 1 < PFI : bit(7) > }
+         { 0 | 1 < EPD A/N Type 2 Extension length : bit (8) >
+-                 < bit (val(EPD A/N Type 2 Extension length) + 1)
+-                 & { < EPD A/N Type 2 Extension Info > ! { bit** = <no string> }} > }
++                 { < bit (val(EPD A/N Type 2 Extension length) + 1) >
++                   & < EPD A/N Type 2 Extension Info > } ! { bit** = <no string> } }
+             -- Truncation of the EGPRS Ack/Nack Description is allowed if the mobile station is assigned a downlink
+             -- dual carrier configuration and the available space in the message without EGPRS Ack/Nack Description IE
+             -- does not allow for the inclusion of a valid EGPRS Ack/Nack Description IE, i.e. is less than 16 bits.
+             -- In the same conditions, the receiver shall assume that no EGPRS Ack/Nack description IE is included.
+         { < EGPRS Ack/Nack Description : < EGPRS Ack/Nack Description IE >> } //
+-       <padding bits > } ;
++       <padding bits > ;
+ 
+ < EPD A/N Type 2 Extension Info > ::=
+    { 0 | 1 < Extended Channel Request Description : < Extended Channel Request Description IE > > }
+    < EARLY_TBF_ESTABLISHMENT : bit (1) >
+-   { 0 | 1 < Secondary Dual Carrier Channel Report : < EGPRS Channel Quality Report Type 2 IE > }
++   { 0 | 1 < Secondary Dual Carrier Channel Report : < EGPRS Channel Quality Report Type 2 IE > > }
+    < spare bit >** // ;         -- Truncation may occur between released versions of the protocol
+                                 -- The receiver shall assume the value zero of any truncated bits
+ 
+@@ -855,8 +830,8 @@
+                            {0
+                            | 1 < RLC Entity 3 : < RLC Entity Struct > > }
+                        }
+-                       { 0 | 1 MTTI_DOWNLINK_ASSIGNMENT_C1 : bit (1) }
+-                       { 0 | 1 MTTI_DOWNLINK_ASSIGNMENT_C2 : bit (1) }
++                       { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C1 : bit (1) > }
++                       { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C2 : bit (1) > }
+                        { null | 0 bit** = < no string > -- Receiver backward compatible with earlier version
+                        |1                               -- Additions for Rel-10
+                            { 1 < EMSR Additional PFCs 1 : < Additional PFCs struct > > } ** 0
+@@ -870,7 +845,7 @@
+ 
+ < Assignment Info struct > ::=
+    < Assignment Type : bit (2) >
+-   < Carrier ID : bit (1) >
++   < Carrier ID : bit (1) > ;
+ 
+ < RLC Entity Struct > ::=
+    < DOWNLINK_TFI_ASSIGNMENT : bit (5) >
+@@ -971,7 +946,9 @@
+ 
+ < Multiple Downlink TBF Assignment struct > ::=
+    < TIMESLOT_ALLOCATION : bit (8) >
+-    Multiple Downlink Assignment struct > ::=
++   { 1 < Downlink TBF assignment : < Downlink TBF assignment struct > > } ** 0 ;
++
++< BTTI Multiple Downlink Assignment struct > ::=
+    { 0 | 1 < TIMESLOT_ALLOCATION_C1 : bit (8) > }
+    { 0 | 1 < TIMESLOT_ALLOCATION_C2 : bit (8) > }
+    { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+@@ -984,7 +961,7 @@
+    < RTTI_DOWNLINK_PDCH_PAIR_ASSIGNMENT_DC : bit (8) >
+    { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+ 
+-< Downlink TBF assignment struct > :: =
++< Downlink TBF assignment struct > ::=
+    { 0 < RB Id : bit (5) >
+     | 1 < PFI : bit (7) >
+         < RLC_MODE : bit (1) > }
+@@ -993,7 +970,7 @@
+    { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+    { 0 | 1 < HFN_LSB : bit (1) > } ;       -- HFN_LSB field used in Iu mode only
+ 
+-< Downlink TBF assignment 2 struct > :: =
++< Downlink TBF assignment 2 struct > ::=
+    < PFI : bit (7) >
+    < RLC_MODE : bit (1) >
+    < TFI Assignment : bit (5) >
+@@ -1002,11 +979,9 @@
+    < EVENT_BASED_FANR: bit (1) >
+    { 0 | 1 < Downlink EGPRS Window Size : < EGPRS Window Size IE > > } ;
+ 
+-< Assignment Info struct > :: =
++< Assignment Info struct > ::=
+    < Assignment Type : bit (2) >
+    < Carrier ID : bit (1) > ;
+-{ 1 < Downlink TBF assignment : < Downlink TBF assignment struct > > } ** 0 ;
+-
+ 
+ -- 11.2.8
+ < Packet Downlink Dummy Control Block message content > ::=
+@@ -1057,13 +1032,13 @@
+ < 3G Measurement Report struct > ::=
+    < N_3G: bit (3) >
+    { < 3G_CELL_LIST_INDEX : bit (7) >
+-        < REPORTING_QUANTITY : bit (6) > } * (val(N_3G + 1 )) ;
++        < REPORTING_QUANTITY : bit (6) > } * (val(N_3G) + 1) ;
+ 
+ < E-UTRAN Measurement Report struct > ::=
+    < N_E-UTRAN: bit (2) >
+    { < E-UTRAN_FREQUENCY_INDEX : bit (3) >
+         < CELL IDENTITY : bit (9) >
+-        < REPORTING_QUANTITY : bit (6) > } * (val(N_E-UTRAN + 1 )) ;
++        < REPORTING_QUANTITY : bit (6) > } * (val(N_E-UTRAN) + 1) ;
+ 
+ -- 11.2.9b
+ < Packet Measurement Order message content > ::=
+@@ -1182,10 +1157,10 @@
+ < 3G Neighbour Cell Description struct> ::=
+    { 0 | 1 < Index_Start_3G : bit (7)> }
+    { 0 | 1 < Absolute_Index_Start_EMR : bit (7)> }
+-   { 0 | 1 < UTRAN FDD Description : < UTRAN FDD Description struct > }
+-   { 0 | 1 < UTRAN TDD Description : < UTRAN TDD Description struct > }
+-   { 0 | 1 < CDMA2000 Description : < CDMA2000 Description struct > }
+-   { 0 | 1 < REMOVED_3GCELL_Description : < REMOVED_3GCELL_Description struct >> } ;
++   { 0 | 1 < UTRAN FDD Description : < UTRAN FDD Description struct > > }
++   { 0 | 1 < UTRAN TDD Description : < UTRAN TDD Description struct > > }
++   { 0 | 1 < CDMA2000 Description : < CDMA2000 Description struct > > }
++   { 0 | 1 < REMOVED_3GCELL_Description : < REMOVED_3GCELL_Description struct > > } ;
+ 
+ < REMOVED_3GCELL_Description struct > ::=
+    < N1 : bit (2) >
+@@ -1198,7 +1173,7 @@
+ 
+ < UTRAN FDD Description struct> ::=
+    { 0 | 1 < Bandwidth_FDD : bit (3) > }
+-   { 1 < Repeated UTRAN FDD Neighbour Cells : Repeated UTRAN FDD Neighbour Cells struct >> } ** 0 ;
++   { 1 < Repeated UTRAN FDD Neighbour Cells : < Repeated UTRAN FDD Neighbour Cells struct >> } ** 0 ;
+ < Repeated UTRAN FDD Neighbour Cells struct > ::=
+    0 < FDD-ARFCN : bit (14) >             -- The value "1" was used in an earlier
+                                            -- version of the protocol and shall not be used.
+@@ -1283,7 +1258,7 @@
+ 
+ < CCN Support Description struct > ::=
+ < Number_Cells : bit (7) >
+-{ CCN_SUPPORTED : bit } * (val(Number_Cells)) ;
++{ < CCN_SUPPORTED : bit > } * (val(Number_Cells)) ;
+ 
+ < Iu Mode Neighbour Cell Params struct > ::=
+     { 0 | 1 < Iu Mode Cell Selection Params : < Iu Mode Cell Selection struct > > }
+@@ -1360,7 +1335,7 @@
+          { null | 0 bit ** = < no string > -- Receiver compatible with earlier release
+          |1                                   -- Additions in Rel-8 :
+               < BITMAP_LENGTH : bit(7) >
+-              { 0 | 1 < REPORTING_QUANTITY : bit (6) > } * (val(BITMAP_LENGTH + 1 ) )
++              { 0 | 1 < REPORTING_QUANTITY : bit (6) > } * (val(BITMAP_LENGTH) + 1)
+               { 0 | 1 < E-UTRAN Measurement Report : < E-UTRAN Measurement Report struct > > }
+               { null | 0 bit ** = < no string > -- Receiver compatible with earlier release
+               |1                                  -- Additions in Rel-9 :
+@@ -1434,7 +1382,7 @@
+             { null | 0 bit** = < no string >             -- Receiver compatible with earlier release
+                      |1                                  -- REL-6 additions:
+                         { 0 | 1 < MBMS Information > }
+-                        { 0 | 1 < NLN status(PPCH) : bit (1) > }
++                        { 0 | 1 < NLN status PPCH  : bit (1) > }
+                         { null | 0 bit** = < no string >            -- Receiver compatible with earlier release
+                                  |1                                 -- REL-8 additions:
+                                     { 0 | 1 < ETWS Primary Notification : < ETWS Primary Notification struct > > }
+@@ -1463,7 +1411,7 @@
+             | 01 < PTMSI : bit (32) >
+             | 11 { < Length of Mobile Identity contents : bit (4) >
+                         < Mobile Identity : octet (val (Length of Mobile Identity contents)) > }
+-            < Page info struct : < Page info struct > > }
++            < Page info struct : < Page info struct > > } }
+         { 0 | 1 < eMLPP_PRIORITY : bit (3) > } }
+    ! < Ignore : bit (*) = <no string> > ;
+ 
+@@ -1473,10 +1421,10 @@
+         < MBMS Sessions List : < MBMS Sessions List IE > >
+         -- Notifications: listed per MBMS Channel Parameters
+         { 1 < MBMS Channel Parameters : < MBMS Channel Parameters IE > >
+-            < MBMS Sessions List : < MBMS Sessions List IE > > } ** 0 } }
++            < MBMS Sessions List : < MBMS Sessions List IE > > } ** 0 }
+    ! < Ignore : bit (*) = <no string> > ;
+ 
+-< Page info struct > :: =
++< Page info struct > ::=
+    < PAGING CAUSE : bit (3) >
+    < CN DOMAIN IDENTITY : bit (2) >
+    { 0 | 1 < Paging Record Type Identifier : bit (2) > }; -- This field Is only included if the MS is paged using a G-RNTI
+@@ -1639,10 +1587,10 @@
+             < CD_LENGTH : { bit (5) exclude 00000 exclude 11111 } >
+             < CONTAINER_DATA : octet (val(CD_LENGTH)) > -- Final container segment. Next container follows.
+         |   < PD : bit (3) >
+-            < CD_LENGTH : { bit (5) := 11111 } >
++            < CD_LENGTH : { bit (5) == 11111 } >
+             < CONTAINER_DATA : octet ** > } **                  -- Container continued in next message.
+         {   < spare bit (3) >                                              -- Repetition continues until:
+-            < CD_LENGTH : { bit (5) := 00000 } > }                         -- A) val(CD_LENGTH) = 0 or
++            < CD_LENGTH : { bit (5) == 00000 } > }                         -- A) val(CD_LENGTH) = 0 or
+    } // ;                                                                  -- B) end of PSCD message.
+ 
+ 
+@@ -1663,7 +1611,7 @@
+         { < MESS_REC : bit (2) == 00 > < null > -- Message type supported but not received
+         | < MESS_REC : bit (2) == 01 > < null > -- Message type supported and received, single instance
+         | < MESS_REC : bit (2) == 10 >           -- Message type supported and partially received, multiple instances
+-                < SIX_CHANGE_MARK : bit (3) >
++                < SIX_CHANGE_MARK : bit (3) > }
+    } ** 0
+    < ADDITIONAL_MSG_TYPE : bit > ;
+ 
+@@ -1858,7 +1806,7 @@
+     { 1 { 0 < LSA_ID : bit (24) >
+              | 1 < ShortLSA_ID : bit (10) > } } ** 0 ;
+ 
+-< COMPACT Information struct > : :=
++< COMPACT Information struct > ::=
+     < Cell Identification : Cell identification IE>
+     { 1 < COMPACT Neighbour Cell params struct > } ** 0 ;
+ 
+@@ -1887,7 +1835,7 @@
+ 
+ < CCN Support Description struct > ::=
+ < Number_Cells : bit (7) >
+-{ CCN_SUPPORTED : bit } * (val(Number_Cells)) ;
++< CCN_SUPPORTED : bit > * (val(Number_Cells)) ;
+ < Iu Mode Neighbour Cell Params struct > ::=
+     < NR_OF_REMAINING_CELLS : bit (4) >
+     { 0 | 1 < Iu Mode Cell Selection Params :
+@@ -2130,7 +1887,8 @@
+             { null | 0 bit** = < no string >                 --Receiver compatible with earlier release
+                 |1                                                --Additions in Release 6:
+                     < 3G_CCN_ACTIVE : bit >
+-        < padding bits > } } }//                             -- truncation at end of message allowed, bits '0' assumed ! < Distribution part error : bit (*) = < no string > > ;
++        < padding bits > } } }//                             -- truncation at end of message allowed, bits '0' assumed
++    ! < Distribution part error : bit (*) = < no string > > ;
+ 
+ < GPRS REP PRIORITY Description struct > ::=
+    < Number_Cells : bit(7) >
+@@ -2210,7 +1968,7 @@
+                             < 700_REPORTING_THRESHOLD : bit (3) > }
+                     { 0 | 1 < 810_REPORTING_OFFSET : bit (3) >
+                             < 810_REPORTING_THRESHOLD : bit (3) > }
+-                < padding bits > } } } }
++                < padding bits > } } }
+    ! < Distribution part error : bit (*) = < no string > > ;
+ 
+ < NC Measurement Parameters struct > ::=
+@@ -2262,14 +2020,15 @@
+    < PSI6_CHANGE_MARK : bit (2) >
+    < PSI6_INDEX : bit (3) >
+    < PSI6_COUNT : bit (3) >
+-   { { < NonGSM Message : < Non-GSM Message struct > > **
++   { < NonGSM Message : < Non-GSM Message struct > > **
+                                                     -- The Non-GSM Message struct is repeated until:
+            { < spare bit > * 3      00000 }             -- A) val(NR_OF_CONTAINER_OCTETS) = 0, or
+            < padding bits > } //                        -- B) the PSI message is fully used
+    ! < Distribution part error : bit (*) = < no string > > ;
++
+ < NonGSM Message struct > ::=
+    < NonGSM Protocol Discriminator : bit(3) >
+-   < NR_OF_CONTAINER_OCTETS : bit(5) exclude 00000 } >
++   < NR_OF_CONTAINER_OCTETS : bit(5) exclude 00000 >
+    { < CONTAINER : bit(8) > } * (val(NR_OF_CONTAINER_OCTETS)) ;
+ 
+ -- 11.2.24
+@@ -2296,7 +2055,7 @@
+ 
+ < DYNAMIC ARFCN MAPPING >::=
+    < GSM_Band : bit (4) >
+-   < ARFCN_FIRST : bit (10) >                                 - - Dynamic ARFCN mapping parameters
++   < ARFCN_FIRST : bit (10) >                                 -- Dynamic ARFCN mapping parameters
+    < BAND_OFFSET: bit (10) >
+    < ARFCN_RANGE : bit (7) > ;
+ 
+@@ -2389,8 +2148,8 @@
+    ! < Distribution part error : bit (*) = < no string >> ;
+ 
+ < UTRAN Frequency List Description struct > ::=
+-   { 1 < FDD_ARFCN > : bit (14) } ** 0              -- FDD frequencies
+-   { 1 < TDD_ARFCN > : bit (14) } ** 0 ;            -- TDD frequencies
++   { 1 < FDD_ARFCN : bit (14) > } ** 0              -- FDD frequencies
++   { 1 < TDD_ARFCN : bit (14) > } ** 0 ;            -- TDD frequencies
+ 
+ -- 11.2.25c
+ < PSI16 message content > ::=
+@@ -2480,7 +2239,7 @@
+                          { 0 | 1 < RB Id : bit (5) > }
+                          < padding bits > }
+                     ! < Non-distribution part error : bit (*) = <no string> > }
+-               ! < Message escape : { 01 | 10 | 11 } bit (*) = <no string> > } } -- Extended for future changes
++               ! < Message escape : { 01 | 10 | 11 } bit (*) = <no string> > } -- Extended for future changes
+        ! < Address information part error : bit (*) = <no string> > }
+    ! < Distribution part error : bit (*) = <no string> > ;
+ 
+@@ -2491,7 +2250,7 @@
+       { 0 | 1 < CONTENTION_RESOLUTION_TLLI : bit (32) >
+               { 0 | 1 < G-RNTI extension : bit (4) > } }
+       { 0 -- TCH TBF mode
+-          { 0 - All data blocks acknowledged, no retransmission requested
++          { 0 -- All data blocks acknowledged, no retransmission requested
+           | 1 < STARTING_SEQUENCE_NUMBER : bit (8) >
+               < RECEIVED_BLOCK_BITMAP : bit (128) > }
+       | 1 -- DCCH TBF mode
+@@ -2959,7 +2718,7 @@
+         { 0 | 1 < USF_ALLOCATION : bit (3) > } * (M-1)
+    };
+ 
+-< Assignment Info struct > :: =
++< Assignment Info struct > ::=
+    < Assignment Type : bit (2) >
+    < Carrier ID : bit (1) > ;
+ 
+@@ -3250,7 +3009,7 @@
+    < Assignment Type : bit (2) >
+    < Carrier ID : bit (1) >;
+ 
+-< RLC Entity Struct> :: =
++< RLC Entity Struct> ::=
+    < TFI : bit (5) >
+    < RLC_MODE : bit (1) >
+    { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+@@ -3389,7 +3148,7 @@
+     { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+     { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+ 
+-< Downlink TBF assignment struct > :: =
++< Downlink TBF assignment struct > ::=
+     { 0 < RB Id : bit (5) >
+     | 1 < PFI : bit (7) >
+          < RLC_MODE : bit (1) > }
+@@ -3398,7 +3157,7 @@
+     < CONTROL_ACK : bit (1) >
+     { 0 | 1 < Downlink EGPRS Window Size : < EGPRS Window Size IE > > } ;
+ 
+-< Downlink TBF assignment 2 struct > :: =
++< Downlink TBF assignment 2 struct > ::=
+     < PFI : bit (7) >
+     < RLC_MODE : bit (1) >
+     { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+@@ -3764,7 +3523,7 @@
+    { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+    { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+ 
+-< Downlink TBF assignment struct > :: =
++< Downlink TBF assignment struct > ::=
+    { 0 | 1 < PFI : bit (7) > }
+    < DOWNLINK_RLC_MODE : bit (1) >
+    { 0 | 1 < Uplink Control Timeslot : bit (3) > }
+@@ -3772,7 +3531,7 @@
+    < CONTROL_ACK : bit (1) >
+    { 0 | 1 < Downlink EGPRS Window Size : < EGPRS Window Size IE > > } ;
+ 
+-< Downlink TBF assignment 2 struct > :: =
++< Downlink TBF assignment 2 struct > ::=
+    { 0 | 1 < PFI : bit (7) > }
+    < RLC_MODE : bit (1) >
+    { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+@@ -3912,7 +3671,7 @@
+    < Assignment Type : bit (2) >
+    < Carrier ID : bit (1) > ;
+ 
+-< RLC Entity > :: =
++< RLC Entity > ::=
+    < TFI_ASSIGNMENT : bit (5) >
+    < RLC_MODE : bit (1) >
+    { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+@@ -3963,7 +3722,7 @@
+    }
+    ! < Distribution part error : bit (*) = < no string > >;
+ 
+-< MBMS bearer description struct > :: =
++< MBMS bearer description struct > ::=
+    { 0 | 1 < MBMS Radio Bearer Starting Time : < bit (16) > }
+    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
+    < DOWNLINK_TIMESLOT_ALLOCATION : bit (8) >
+@@ -3989,7 +3748,7 @@
+         < padding bits >
+    ! < Distribution part error : bit (*) = < no string > > } ;
+ 
+-< MBMS bearer description struct > :: =
++< MBMS bearer description struct > ::=
+    { 0 | 1 < MBMS Radio Bearer Starting Time : < bit (16) > > }
+    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
+    < DOWNLINK_TIMESLOT_ALLOCATION : bit (8) >
+@@ -4038,7 +3797,7 @@
+     < padding bits >
+ ! < Distribution part error : bit (*) = < no string > > ;
+ 
+-< PBCCH information struct > :: =
++< PBCCH information struct > ::=
+     < Pb : bit (4) >
+     < TSC : bit (3) >
+     < TN : bit (3) >
+@@ -4049,12 +3808,12 @@
+                    < Neighbour MBMS Bearer Identity : bit (val (Length of Neighbour MBMS Bearer Identity)) >
+     };
+ 
+-< MBMS Frequency List struct > :: =
++< MBMS Frequency List struct > ::=
+     < FREQ_LIST_NUMBER : bit (2) >
+     < Length of Frequency List contents : bit (4) >
+     < Frequency List contents : octet (val(Length of Frequency List contents) + 3) > ;
+ 
+-< MBMS p-t-m Frequency Parameters struct > :: =
++< MBMS p-t-m Frequency Parameters struct > ::=
+     < TSC : bit (3) >
+     { 0 < ARFCN : bit (10 >
+     | 1 < MAIO : bit (6) >
+@@ -4104,7 +3863,7 @@
+    < padding bits > } //       -- truncation at end of message allowed, bits '0' assumed
+    ! < Distribution part error : bit (*) = < no string > > ;
+ 
+-< MBMS p-t-m channel description struct > :: =
++< MBMS p-t-m channel description struct > ::=
+    < Estimated Session Duration : bit (8) >
+    { 0 | 1 < MBMS Radio Bearer Starting Time : bit (16) > }
+    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
+@@ -4114,7 +3873,7 @@
+    { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE >> }
+    { 0 | 1 < NPM Transfer Time : bit (5) > };
+ 
+-< MPRACH description struct > :: =
++< MPRACH description struct > ::=
+    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
+    < MPRACH_TIMESLOT : bit (3) >
+    < USF : bit (3) >
+@@ -4177,7 +3936,7 @@
+     ! < Address information part error : bit (*) = < no string > > }
+ ! < Distribution part error : bit (*) = < no string > > ;
+ 
+-< RLC Entity Struct > :: =
++< RLC Entity Struct > ::=
+     < TFI : bit (5) >
+     < RLC_MODE : bit (1) >
+     { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }

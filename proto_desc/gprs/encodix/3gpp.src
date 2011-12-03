@@ -1,0 +1,13 @@
+# Basic ETSI/3GPP type definitions
+csn.1 {
+	<bit> ::= 0|1;
+	<bit string> ::= 0|1;
+	<spare L> ::= L;
+	<spare bits> ::= L|H;
+	<spare bit> ::= <bit>;
+	<octet> ::= bit*(8);
+	<spare padding> ::= L* ENCODE_EXPR: %{(8 - (CURPOS & 7)) & 7}% DECODE_INFINITE;
+	<no string> ::= null;
+	<padding bits> ::= <bit>**;
+	slave <A5 bits> ::= <A5/7: bit> <A5/6: bit> <A5/5: bit> <A5/4: bit>;
+}

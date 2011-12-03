@@ -1,0 +1,124 @@
+--- foo	2011-12-03 21:17:19.000000000 +0100
++++ gsm_44_060_10_6_0_ies.src	2011-12-03 21:40:28.000000000 +0100
+@@ -41,6 +44,10 @@
+    < C_VALUE : bit (6) >
+    < EGPRS Timeslot Link Quality Measurements : <EGPRS Timeslot Link Quality Measurements IE >> ;
+ 
++-- 12.5.2
++< EGPRS Window Size IE > ::=
++  < bit (5) > ;
++
+ -- 12.5.3
+ <EGPRS BEP Link Quality Measurements IE> ::=
+   { 0 | 1 < GMSK_MEAN_BEP : bit (5) >
+@@ -318,7 +325,7 @@
+           { 0 | 1 < UPLINK_TIMING_ADVANCE_INDEX : bit (4) >
+                    < UPLINK_TIMING_ADVANCE_TIMESLOT_NUMBER : bit (3) > }
+           { 0 | 1 < DOWNLINK_TIMING_ADVANCE_INDEX : bit (4) >
+-                   < DOWNLINK_TIMING_ADVANCE_TIMESLOT_NUMBER : bit (3) > }
++                   < DOWNLINK_TIMING_ADVANCE_TIMESLOT_NUMBER : bit (3) > } ;
+ 
+ -- 12.13
+ < Power Control Parameters IE > ::=
+@@ -347,8 +354,8 @@
+ 
+ -- 12.21
+ < Starting Frame Number Description IE > ::=
+-   { 0 < Absolute Frame Number Encoding >
+-   | 1 < Relative Frame Number Encoding > } ;
++   { 0 < Absolute Frame Number Encoding : bit(16) >
++   | 1 < Relative Frame Number Encoding : bit(13) > } ;
+ 
+ -- 12.23
+ < Cell Identification IE > ::=
+@@ -369,13 +376,13 @@
+             < PAN_INC : bit (3) >
+             < PAN_MAX : bit (3) > }
+    -- Optional extension information:
+-   { 0 | 1 <Extension Length : bit (6)>
+-            < bit (val(Extension Length) + 1)
+-            & { <Extension Information > ! { bit ** = <no string> } } > } ;
++     { 0 | 1 < Extension Length : bit (6) >
++	      { < bit (val(Extension Length) + 1) >
++	        & <Extension Information > } ! { bit ** = <no string> } } ;
+ 
+-< Extension Information> : : =
++< Extension Information > ::=
+    { { -- R99 extension:
+-        { 0 | 1 - EGPRS supported by the cell if the choice bit is set to '1'
++        { 0 | 1 -- EGPRS supported by the cell if the choice bit is set to '1'
+                  < EGPRS_PACKET_CHANNEL_REQUEST : bit >
+                  < BEP_PERIOD : bit (4) > }
+         < PFC_FEATURE_MODE: bit >
+@@ -427,16 +434,16 @@
+    < MS-TXPWR-MAX-CCCH : bit (5) >                -- maximum Tx power level
+    -- Optional extension information:
+    { 0 | 1 < Extension Length : bit (6) >
+-            < bit (val(Extension Length) + 1)
+-            & { <Extension Information > ! { bit ** = <no string> } } > } ;
++            { < bit (val(Extension Length) + 1) >
++	      & <Extension Information > } ! { bit ** = <no string> } } ;
+ < Extension Information > ::=
+    < ECSC: bit >                                  -- Early Classmark Sending Control
+-   < 3G ECSR >                                    -- 3G Early Classmark Sending Restriction
++   < 3G ECSR : bit >                                    -- 3G Early Classmark Sending Restriction
+    < spare bit > ** ;
+ 
+ -- 12.28
+ < LSA Parameters IE > ::=
+-   < NR_OF_FREQ_OR_CELLS : bit (5) >:
++   < NR_OF_FREQ_OR_CELLS : bit (5) >
+    { < LSA ID information : < LSA ID information struct >> * (val(NR_OF_FREQ_OR_CELLS)) };
+ 
+ < LSA ID information struct > ::=
+@@ -486,12 +543,12 @@
+       { 0 | 1 < MPRACH description : < MPRACH description IE > > } };
+ 
+ -- 12.37
+-< MBMS p-t-m channel description IE > :: =
++< MBMS p-t-m channel description IE > ::=
+    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
+    < DL_TIMESLOT_ALLOCATION : bit (8) >;
+ 
+ -- 12.38
+-< MPRACH description IE > :: =
++< MPRACH description IE > ::=
+    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
+    < MPRACH_TIMESLOT NUMBER : bit (3) >
+    < USF : bit (3) >
+@@ -1179,7 +646,7 @@
+ < 3G Priority Parameters IE > ::=
+    { 0 | 1 < DEFAULT_UTRAN_PRIORITY : bit(3) >
+            < DEFAULT_THRESH_UTRAN: bit(5) >
+-           < DEFAULT_UTRAN_QRXLEVMIN: bit(5) }
++           < DEFAULT_UTRAN_QRXLEVMIN: bit(5) > }
+    { 1 < Repeated UTRAN Priority Parameters : < Repeated UTRAN Priority Parameters struct >> } ** 0 ;
+ 
+ < Repeated UTRAN Priority Parameters struct > ::=
+@@ -1238,7 +705,7 @@
+           { 1 < E-UTRAN_FREQUENCY_INDEX : bit (3) > } ** 0 } ** 0 ;
+ 
+ -- 12.56
+-< Measurement Control Parameters Description> :: =
++< Measurement Control Parameters Description> ::=
+    { 0 | 1 < Measurement_Control_E-UTRAN : bit(1) >
+            < E-UTRAN_FREQUENCY_INDEX : bit (3) >
+            { 1 < E-UTRAN_FREQUENCY_INDEX : bit (3) > } ** 0
+@@ -1253,7 +720,7 @@
+    { 1 < PCID : bit (9) > } ** 0 -- explicit PCID coding
+    { 0 | 1 < PCID_BITMAP_GROUP : bit (6) > }
+    { 1 < PCID_Pattern_length : bit (3) >
+-        < PCID_Pattern : bit (val(PCID_Pattern_length + 1)) >
++        < PCID_Pattern : bit (val(PCID_Pattern_length) + 1) >
+         < PCID_pattern_sense : bit (1) >
+    } ** 0 ;
+ 
+@@ -1261,7 +728,7 @@
+ < PSC Group IE > ::=
+    { 1 < PSC : bit (9) > } ** 0           -- explicit PSC coding
+    { 1 < PSC_Pattern_length : bit (3) >
+-        < PSC_Pattern : bit (val(PSC_Pattern_length + 1)) >
++        < PSC_Pattern : bit (val(PSC_Pattern_length) + 1) >
+         < PSC_pattern_sense : bit (1) >
+    } ** 0 ;
+ 
