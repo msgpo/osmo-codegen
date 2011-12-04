@@ -3,6 +3,12 @@
 csn.1 slave {
 -- 3GPP TS 44.060 version 10.6.0 Release 10
 
+-- imported from 44.118 9.3.5
+< CN Domain Identity IE > ::=
+   < CN Domain Identity : bit (2) > ;
+< CN Domain Specific DRX Cycle Length Coefficient IE > ::=
+   < CN Domain Specific DRX Cycle Length Coefficient : bit (2) >;
+
 -- 12.3
 < Ack/Nack Description IE > ::=
    < FINAL_ACK_INDICATION : bit (1) >
@@ -46,7 +52,7 @@ csn.1 slave {
 
 -- 12.5.2
 < EGPRS Window Size IE > ::=
-  < bit (5) > ;
+  < EGPRS Window Size: bit (5) > ;
 
 -- 12.5.3
 <EGPRS BEP Link Quality Measurements IE> ::=
@@ -313,6 +319,19 @@ csn.1 slave {
    < ARFCN_INDEX : bit (6) >
    { 0 | 1 < ARFCN index list struct > } ;
 
+-- 12.10d
+< EGPRS Modulation and Coding Scheme IE > ::=
+   bit(4) ;
+
+-- 12.10f
+< EGPRS Level IE > ::=
+   bit(2) ;
+
+-- 12.11
+< Packet Request Reference IE > ::=
+   < RANDOM_ACCESS_INFORMATION value : bit (11) >
+   < FRAME_NUMBER : bit (16) > ;
+
 -- 12.12
 < Packet Timing Advance IE > ::=
    { 0 | 1 < TIMING_ADVANCE_VALUE : bit (6) > }
@@ -346,6 +365,13 @@ csn.1 slave {
    < S : bit (4) >
    < TX_INT : bit (4) >
    { 0 | 1 < PERSISTENCE_LEVEL : bit (4) > * 4 } ;
+
+-- 12.16
+< TLLI / G-RNTI IE > ::=
+   < TLLI / G-RNTI : bit(32) > ;
+
+< TLLI IE > ::=
+   < TLLI : bit(32) > ;
 
 -- 12.16a
 < G-RNTI IE > ::=
@@ -555,7 +581,7 @@ csn.1 slave {
    {0|1        < MPRACH Control Parameters : < MPRACH Control Parameters IE > > } ;
 
 -- 12.39
-< MBMS Session List IE > ::=
+< MBMS Sessions List IE > ::=
    { 1 < TMGI : < TMGI IE >>
        { 0 | 1 < MBMS Session Identity : bit (8) > } } ** 0;
 
@@ -705,7 +731,7 @@ csn.1 slave {
           { 1 < E-UTRAN_FREQUENCY_INDEX : bit (3) > } ** 0 } ** 0 ;
 
 -- 12.56
-< Measurement Control Parameters Description> ::=
+< Measurement Control Parameters Description IE> ::=
    { 0 | 1 < Measurement_Control_E-UTRAN : bit(1) >
            < E-UTRAN_FREQUENCY_INDEX : bit (3) >
            { 1 < E-UTRAN_FREQUENCY_INDEX : bit (3) > } ** 0
