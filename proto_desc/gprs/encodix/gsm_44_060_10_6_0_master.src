@@ -1,0 +1,260 @@
+declare gsm-0460 message set Downlink_RLC_MAC;
+declare gsm-0460 message set Uplink_RLC_MAC;
+
+`INCLUDE gsm_44_060_10_6_0_ies.src`
+`INCLUDE gsm_44_060_10_6_0_msgs.src`
+
+gsm-0460 Packet_Access_Reject {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100001;
+	contents M V >=0 Packet_Access_Reject_message_content;
+}
+
+gsm-0460 Packet_Cell_Change_Order {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000001;
+	contents M V >=0 Packet_Cell_Change_Order_message_content;
+}
+
+gsm-0460 Packet_Downlink_Assignment {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000010;
+	contents M V >=0 Packet_Downlink_Assignment_message_content;
+}
+
+gsm-0460 Packet_Measurement_Order {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000011;
+	contents M V >=0 Packet_Measurement_Order_message_content;
+}
+
+gsm-0460 Packet_Paging_Request {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100010;
+	contents M V >=0 Packet_Paging_Request_message_content;
+}
+
+gsm-0460 Packet_PDCH_Release {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100011;
+	contents M V >=0 Packet_PDCH_Release_message_content;
+}
+
+gsm-0460 Packet_Polling_Request {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000100;
+	contents M V >=0 Packet_Polling_Request_message_content;
+}
+
+gsm-0460 Packet_Power_Control_Timing_Advance {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000101;
+	contents M V >=0 Packet_Power_Control_Timing_Advance_message_content;
+}
+
+gsm-0460 Packet_PRACH_Parameters {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100100;
+	contents M V >=0 Packet_PRACH_Parameters_message_content;
+}
+
+gsm-0460 Packet_Queueing_Notification {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000110;
+	contents M V >=0 Packet_Queueing_Notification_message_content;
+}
+
+gsm-0460 Packet_Timeslot_Reconfigure {
+	in message set Downlink_RLC_MAC;
+	MessageType = 000111;
+	contents M V >=0 Packet_Timeslot_Reconfigure_message_content;
+}
+
+gsm-0460 Packet_TBF_Release {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001000;
+	contents M V >=0 Packet_TBF_Release_message_content;
+}
+
+gsm-0460 Packet_Uplink_Ack_Nack {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001001;
+	contents M V >=0 Packet_Uplink_Ack_Nack_message_content;
+}
+
+gsm-0460 Packet_Uplink_Assignment {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001010;
+	contents M V >=0 Packet_Uplink_Assignment_message_content;
+}
+
+gsm-0460 Packet_Cell_Change_Continue {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001011;
+	contents M V >=0 Packet_Cell_Change_Continue_message_content;
+}
+
+gsm-0460 Packet_Neighbour_Cell_Data {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001100;
+	contents M V >=0 Packet_Neighbour_Cell_Data_message_content;
+}
+
+gsm-0460 Packet_Serving_Cell_Data {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001101;
+	contents M V >=0 Packet_Serving_Cell_Data_message_content;
+}
+
+gsm-0460 Packet_DBPSCH_Assignment {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001110;
+	contents M V >=0 Packet_DBPSCH_Assingment_message_content;
+}
+
+gsm-0460 Multiple_TBF_Downlink_Assignment {
+	in message set Downlink_RLC_MAC;
+	MessageType = 001111;
+	contents M V >=0 Multiple_TBF_Downlink_Assingment_message_content;
+}
+
+-- gsm-0460 Multiple_TBF_Uplink_Assignment {
+-- gsm-0460 Multiple_TBF_Timeslot_Reconfigure {
+
+gsm-0460 MBMS_MS_ID_Assignment {
+	in message set Downlink_RLC_MAC;
+	MessageType = 010011;
+	contents M V >=0 MBMS_MS_ID_Assignment_message_content;
+}
+
+gsm-0460 MBMS_Assignment_Non_distribution {
+	in message set Downlink_RLC_MAC;
+	MessageType = 010100;
+	contents M V >=0 MBMS_Assignment_Non_distribution_message_content;
+}
+
+gsm-0460 Packet_Physical_Information {
+	in message set Downlink_RLC_MAC;
+	MessageType = 010110;
+	contents M V >=0 Packet_Physical_Information_message_content;
+}
+
+gsm-0460 Packet_Downlink_Dummy_Control_Block {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100101;
+	contents M V >=0 Packet_Downlink_Dummy_Control_Block_message_content;
+}
+
+gsm-0460 PSI1 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 110001;
+	contents M V >=0 PSI1_message_content;
+}
+
+gsm-0460 PSI2 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 110010;
+	contents M V >=0 PSI2_message_content;
+}
+
+gsm-0460 PSI3 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 110011;
+	contents M V >=0 PSI3_message_content;
+}
+
+-- gsm-0460 PSI3_bis {
+
+gsm-0460 PSI5 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 110110;
+	contents M V >=0 PSI5_message_content;
+}
+
+gsm-0460 PSI6 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 110000;
+	contents M V >=0 PSI6_message_content;
+}
+
+gsm-0460 PSI7 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 111000;
+	contents M V >=0 PSI7_message_content;
+}
+
+gsm-0460 PSI8 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 111001;
+	contents M V >=0 PSI8_message_content;
+}
+
+gsm-0460 PSI13 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 110111;
+	contents M V >=0 PSI13_message_content;
+}
+
+gsm-0460 PSI14 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 111010;
+	contents M V >=0 PSI14_message_content;
+}
+
+-- gsm-0460 PSI13_ter {
+
+gsm-0460 PSI13_quater {
+	in message set Downlink_RLC_MAC;
+	MessageType = 111101;
+	contents M V >=0 PSI13_quater_message_content;
+}
+
+gsm-0460 PSI15 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 111110;
+	contents M V >=0 PSI15_message_content;
+}
+
+gsm-0460 PSI16 {
+	in message set Downlink_RLC_MAC;
+	MessageType = 101000;
+	contents M V >=0 PSI16_message_content;
+}
+
+gsm-0460 Packet_Serving_Cell_SI {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100000;
+	contents M V >=0 Packet_Serving_Cell_message_content;
+}
+
+gsm-0460 Packet_CS_Command {
+	in message set Downlink_RLC_MAC;
+	MessageType = 100111;
+	contents M V >=0 Packet_CS_Command_message_content;
+}
+
+-- gsm-0460 Packet_CS_Release_Indication {
+
+gsm-0460 MBMS_Assignment_Distribution {
+	in message set Downlink_RLC_MAC;
+	MessageType = 101010;
+	contents M V >=0 MBMS_Assignment_Distribution_message_content;
+}
+
+gsm-0460 MBMS_Neighbouring_Cell_Information {
+	in message set Downlink_RLC_MAC;
+	MessageType = 101011;
+	contents M V >=0 MBMS_Neighbouring_Cell_Information_message_content;
+}
+
+gsm-0460 Packet_MBMS_Announcement {
+	in message set Downlink_RLC_MAC;
+	MessageType = 101100;
+	contents M V >=0 Packet_MBMS_Announcement_message_content;
+}
+
+gsm-0460 Packet_Application_Information {
+	in message set Downlink_RLC_MAC;
+	MessageType = 101101;
+	contents M V >=0 Packet_Application_Information_message_content;
+}
