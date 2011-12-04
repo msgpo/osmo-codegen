@@ -478,8 +478,7 @@ csn.1 {
    < One Phase Access Request : 0 < MultislotClass : bit (5) >
            < Priority : bit (2) >
            < RandomBits : bit (3) > >
-   | < Short Access Request : 100 -- The value 100 was allocated in an earlier version of the protocol and shall not
-be used by the mobile station
+   | < Short Access Request : 100 -- The value 100 was allocated in an earlier version of the protocol and shall not be used by the mobile station
            < NumberOfBlocks : bit (3) >
            < Priority : bit (2) >
            < RandomBits : bit (3) > >
@@ -497,8 +496,7 @@ be used by the mobile station
 < Packet channel request 8 bit message content > ::=
    < One Phase Access Request : 1 < MultislotClass : bit (5) >
            < RandomBits : bit (2) > >
-   | < Short Access Request : 00 -- The value 00 was allocated in an earlier version of the protocol and shall not be
-used by the mobile station
+   | < Short Access Request : 00 -- The value 00 was allocated in an earlier version of the protocol and shall not be used by the mobile station
            < NumberOfBlocks : bit (3) >
            < RandomBits : bit (3) > >
    | < Two Phase Access Request : 01000 < RandomBits : bit (3) > >
@@ -516,8 +514,7 @@ used by the mobile station
    < One Phase Access Request : 0 < MultislotClass : bit (5) >
           < Priority : bit (2) >
           < RandomBits : bit (3) > >
-   | < Short Access Request : 100 -- The value 100 was allocated in an earlier version of the protocol and shall not
-be used by the mobile station
+   | < Short Access Request : 100 -- The value 100 was allocated in an earlier version of the protocol and shall not be used by the mobile station
           < NumberOfBlocks : bit (3) >
           < Priority : bit (2) >
           < RandomBits : bit (3) > >
@@ -1191,7 +1188,7 @@ be used by the mobile station
    < NR_OF_TDD_CELLS : bit (5) >
    < TDD_CELL_INFORMATION Field : bit(q(NR_OF_TDD_CELLS)) > ;
                                            -- q(x) defined in table 11.2.9b.2.b/3GPP TS 44.060
-< CDMA 2000 Description struct> ::=
+< CDMA2000 Description struct> ::=
         < cdma2000 frequency band : bit (5) >
         < cdma2000 frequency : bit (11) >
         < number_cdma2000_cells : bit (5) >
@@ -1368,6 +1365,33 @@ be used by the mobile station
     { < E-UTRAN_FREQUENCY_INDEX : bit (3) >
          < CELL IDENTITY : bit (9) >
          < REPORTING_QUANTITY : bit (6) > } * (val(N_E-UTRAN) + 1) ;
+
+-- 11.2.9e
+< Packet Neighbour Cell Data message content > ::=
+   < PAGE_MODE : bit (2) >
+   { 0 < Global TFI : < Global TFI IE > >
+        {   < CONTAINER_ID : bit (2) >
+            < spare : bit (1) >
+            < CONTAINER_INDEX : bit (5) >
+            { 0 | 1 < ARFCN : bit (10) >
+                < BSIC : bit (6) > }
+            < CONTAINER : < Container repetition struct > >
+            < padding bits >
+            ! < Non-distribution part error : bit (*) = < no string > > }
+        ! < Address information part error : bit (*) = < no string > > }
+   ! < Distribution part error : bit (*) = < no string > > ;
+
+< Container repetition struct > ::=
+   {
+        { < PD : bit (3) >
+            < CD_LENGTH : { bit (5) - { 00000 | 11111 } } >
+            < CONTAINER_DATA : octet (val(CD_LENGTH)) > -- Final container segment. Next container follows.
+        |   < PD : bit (3) >
+            < CD_LENGTH : { bit (5) == 11111 } >
+            < CONTAINER_DATA : octet ** > } **                  -- Container continued in next message.
+        {   < spare bit (3) >                                   -- Repetition of the container repetition struct continues until:
+            < CD_LENGTH : { bit (5) == 00000 } > }              -- A) val(CD_LENGTH) = 0 or
+   } // ;                                                       -- B) end of PNCD message.
 
 -- 11.2.10
 < Packet Paging Request message content > ::=
@@ -1584,7 +1608,7 @@ be used by the mobile station
 < Container repetition struct > ::=
    {
         { < PD : bit (3) >
-            < CD_LENGTH : { bit (5) exclude 00000 exclude 11111 } >
+            < CD_LENGTH : { bit (5) - { 00000 | 11111 } } >
             < CONTAINER_DATA : octet (val(CD_LENGTH)) > -- Final container segment. Next container follows.
         |   < PD : bit (3) >
             < CD_LENGTH : { bit (5) == 11111 } >
@@ -1608,9 +1632,9 @@ be used by the mobile station
 
 < SI Message List struct > ::=
    { 1 < SI_MESSAGE_TYPE : bit (8) >
-        { < MESS_REC : bit (2) == 00 > < null > -- Message type supported but not received
-        | < MESS_REC : bit (2) == 01 > < null > -- Message type supported and received, single instance
-        | < MESS_REC : bit (2) == 10 >           -- Message type supported and partially received, multiple instances
+        { < MESS_REC : bit (2) == 00 > null -- Message type supported but not received
+        | < MESS_REC : bit (2) == 01 > null -- Message type supported and received, single instance
+        | < MESS_REC : bit (2) == 10 >      -- Message type supported and partially received, multiple instances
                 < SIX_CHANGE_MARK : bit (3) > }
    } ** 0
    < ADDITIONAL_MSG_TYPE : bit > ;
@@ -1623,7 +1647,7 @@ be used by the mobile station
 < Packet Serving Cell SI message content > ::=
    < PAGE_MODE : bit (2) >
    < CONTAINER_DATA : octet ** >
-   < padding bits >z
+   < padding bits >
    ! < Distribution part error : bit (*) = < no string > > ;
 
 -- 11.2.18
@@ -1873,7 +1897,7 @@ be used by the mobile station
    < PSI3_QUATER_INDEX : bit (4) >
    < PSI3_QUATER_COUNT : bit (4) >
    { { 0 | 1 < GPRS REP_PRIORITY Description : < GPRS REP PRIORITY Description struct >> }
-        { 0 | 1 < 3G Neighbour Cells Description : < 3G Neighbour Cells Description struct >> }
+        { 0 | 1 < 3G Neighbour Cell Description : < 3G Neighbour Cell Description struct >> }
         { 0 | 1 < 3G MEASUREMENT Parameters Description :
                 < 3G MEASUREMENT PARAMETERS Description struct >> }
         { 0 | 1 < 3G Initial Dedicated Mode Reporting Description :
@@ -2020,16 +2044,20 @@ be used by the mobile station
    < PSI6_CHANGE_MARK : bit (2) >
    < PSI6_INDEX : bit (3) >
    < PSI6_COUNT : bit (3) >
-   { < NonGSM Message : < Non-GSM Message struct > > **
-                                                    -- The Non-GSM Message struct is repeated until:
+   { < NonGSM Message : < NonGSM Message struct > > **
+                                                    -- The NonGSM Message struct is repeated until:
            { < spare bit > * 3      00000 }             -- A) val(NR_OF_CONTAINER_OCTETS) = 0, or
            < padding bits > } //                        -- B) the PSI message is fully used
    ! < Distribution part error : bit (*) = < no string > > ;
 
 < NonGSM Message struct > ::=
    < NonGSM Protocol Discriminator : bit(3) >
-   < NR_OF_CONTAINER_OCTETS : bit(5) exclude 00000 >
+   < NR_OF_CONTAINER_OCTETS : bit(5) - 00000 >
    { < CONTAINER : bit(8) > } * (val(NR_OF_CONTAINER_OCTETS)) ;
+
+-- 11.2.23b
+< PSI7 message content> ::=
+   < PSI6 message content > ;
 
 -- 11.2.24
 < PSI8 message content > ::=
@@ -2100,10 +2128,8 @@ be used by the mobile station
 -- 11.2.25a
 < PSI14 message content > ::=
     < PAGE_MODE : bit (2) >
-    { 0 < CCCH Access Information : < CCCH Access Information struct >> -- This information shall always be
-included. See sub-clause 1.6.
-         | 1 < PBCCH Description : < PBCCH Description struct 2 >>       -- This information shall never be included. See
-sub-clause 1.6.
+    { 0 < CCCH Access Information : < CCCH Access Information struct >> -- This information shall always be included. See sub-clause 1.6.
+         | 1 < PBCCH Description : < PBCCH Description struct 2 >>       -- This information shall never be included. See sub-clause 1.6.
          < padding bits > }
      ! < Distribution part error : bit (*) = < no string >> ;
 
@@ -2115,7 +2141,7 @@ sub-clause 1.6.
     < PRIORITY_ACCESS_THR : bit (3) >
     < NETWORK_CONTROL_ORDER : bit (2) >
     < GPRS Cell Options : < GPRS Cell Options IE >>
-    < GPRS Power Control Parameters : < GPRS Power Control Parameters struct >>
+    < GPRS Power Control Parameters : < GPRS Power Control Parameters IE >>
     < SGSNR : bit >
     { null | 0 bit ** = < no string >                           -- Receiver backward compatible with earlier version
          |1                                                     -- Additions for Dual Transfer Mode
@@ -2759,14 +2785,14 @@ sub-clause 1.6.
                                         { 0 < EMST_NW_Capability : bit (1) > -- EMST is not used
                                         |1                                          -- EMST is used
                                             {0
-                                            | 1 < Downlink RLC Entity 2 : < RLC Entity Struct>
+                                            | 1 < Downlink RLC Entity 2 : < RLC Entity Struct> >
                                                  {0
-                                                 | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> }
+                                                 | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> > }
                                             }
                                             {0
-                                            | 1 < Uplink RLC Entity 2 : < RLC Entity Struct>
+                                            | 1 < Uplink RLC Entity 2 : < RLC Entity Struct> >
                                                  {0
-                                                 | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> }
+                                                 | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> > }
                                             }
                                         }
                                         { null | 0 bit** = < no string > -- Receiver backward compatible with earlier version
@@ -2901,20 +2927,20 @@ sub-clause 1.6.
                                                                 -- EMST is used
                     |1
                          {0
-                         | 1 < Downlink RLC Entity 2 : < RLC Entity Struct>
+                         | 1 < Downlink RLC Entity 2 : < RLC Entity Struct> >
                               {0
-                              | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> }
+                              | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> > }
                          }
                          {0
-                         | 1 < Uplink RLC Entity 2 : < RLC Entity Struct>
+                         | 1 < Uplink RLC Entity 2 : < RLC Entity Struct> >
                               {0
-                              | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> }
+                              | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> > }
                          }
                     }
-                    { 0 | 1 MTTI_DOWNLINK_ASSIGNMENT_C1 : bit (1) }
-                    { 0 | 1 MTTI_DOWNLINK_ASSIGNMENT_C2 : bit (1) }
-                    { 0 | 1 MTTI_UPLINK_ASSIGNMENT_C1 : bit(1) }
-                    { 0 | 1 MTTI_UPLINK_ASSIGNMENT_C2 : bit(1) }
+                    { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C1 : bit (1) > }
+                    { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C2 : bit (1) > }
+                    { 0 | 1 < MTTI_UPLINK_ASSIGNMENT_C1 : bit(1) > }
+                    { 0 | 1 < MTTI_UPLINK_ASSIGNMENT_C2 : bit(1) > }
                     { null | 0 bit** = < no string > -- Receiver backward compatible with earlier version
                     |1                               -- Additions for Rel-10
                          {0       -- EMSR is not enabled in downlink
@@ -2931,7 +2957,7 @@ sub-clause 1.6.
                          }                   < padding bits > } }
                 ! < Non-distribution part error : bit (*) = < no string > > }
                 ! < Non-distribution part error : bit (*) = < no string > > }
-        ! < Message escape : { 10 | 11 } bit (*) = <no string> > } }              -- Extended for future changes
+        ! < Message escape : { 10 | 11 } bit (*) = <no string> > }              -- Extended for future changes
     ! < Address information part error : bit (*) = < no string > > }
 ! < Distribution part error : bit (*) = < no string > > ;
 
@@ -3702,7 +3728,7 @@ sub-clause 1.6.
                         { 0 | 1< GAMMA : bit (5) > }
                 }
         }
-        { 0 | 1 < TMGI : < TMGI struct > > }
+        { 0 | 1 < TMGI : < TMGI IE > > }
         { 0 | 1 < MBMS Session Identity : bit (8) > }
         { 00                    -- Assignment reject. No point-to-multipoint channel is established for the MBMS session.
             < Reject cause: bit (2) >
@@ -3712,7 +3738,7 @@ sub-clause 1.6.
             < Estimated Session Duration : bit (8) >
             < MBMS In-band Signalling Indicator : < MBMS In-band Signalling Indicator IE > >
         | 10                    -- The MBMS Bearer Identity is reassigned for the MBMS radio bearer.
-            { 0 | 1 < MBMS Radio Bearer Starting Time : < bit (16) > }
+            { 0 | 1 < MBMS Radio Bearer Starting Time : < bit (16) > > }
             < Length of MBMS Bearer Identity : bit (3) >
             < MBMS Bearer Identity : bit (val (Length of MBMS Bearer Identity)) >
        }
@@ -3723,7 +3749,7 @@ sub-clause 1.6.
    ! < Distribution part error : bit (*) = < no string > >;
 
 < MBMS bearer description struct > ::=
-   { 0 | 1 < MBMS Radio Bearer Starting Time : < bit (16) > }
+   { 0 | 1 < MBMS Radio Bearer Starting Time : < bit (16) > > }
    { 0 | 1 < Frequency Parameters : < Frequency Parameters IE > > }
    < DOWNLINK_TIMESLOT_ALLOCATION : bit (8) >
    < Length of MBMS Bearer Identity : bit (3) >
@@ -3735,7 +3761,7 @@ sub-clause 1.6.
 -- 11.2.39a
 < MBMS Assignment Distribution message content > ::=
    < PAGE_MODE : bit (2) >
-{ < TMGI : < TMGI struct > >
+{ < TMGI : < TMGI IE > >
         { 0 | 1 < MBMS Session Identity : bit (8) > }
         {0                 -- Assignment reject. No point-to-multipoint channel is established for the MBMS session.
             < Reject cause: bit (2) >
@@ -3815,7 +3841,7 @@ sub-clause 1.6.
 
 < MBMS p-t-m Frequency Parameters struct > ::=
     < TSC : bit (3) >
-    { 0 < ARFCN : bit (10 >
+    { 0 < ARFCN : bit (10) >
     | 1 < MAIO : bit (6) >
          < HSN : bit (6) >
          < FREQ_LIST_NUMBER : bit (2) > } ;
@@ -3860,7 +3886,8 @@ sub-clause 1.6.
             { 0 | 1 < MPRACH description : < MPRACH description struct > > }
         }
    { 0 | 1 < RESTRICTION_TIMER : bit (4) > }
-   < padding bits > } //       -- truncation at end of message allowed, bits '0' assumed
+   < padding bits > //
+       					-- truncation at end of message allowed, bits '0' assumed
    ! < Distribution part error : bit (*) = < no string > > ;
 
 < MBMS p-t-m channel description struct > ::=
@@ -3890,7 +3917,7 @@ sub-clause 1.6.
                   { 00 < PS Handover RR Info: < PS Handover Radio Resources IE > >
                   | 01 < PS Handover RR 2 Info: < PS Handover Radio Resources 2 IE > >
                   ! < RR Handover RR Info Error : { 10 | 11 } bit (*) = <no string> > } - Extended for future changes
-                  { 0 | 1 < NAS Container for PS Handover IE > }
+                  { 0 | 1 < NAS Container for PS Handover IE > } >
          | 01 < PS Handover to UTRAN Payload :
                   < RRC Container IE > >
          | 10 < PS Handover to E-UTRAN Payload :
@@ -3907,14 +3934,14 @@ sub-clause 1.6.
                        { 0 < EMST_NW_Capability : bit (1) >            -- EMST is not used
                        |1                                              -- EMST is used
                            {0
-                           | 1 < Downlink RLC Entity 2 : < RLC Entity Struct>
+                           | 1 < Downlink RLC Entity 2 : < RLC Entity Struct> >
                                 {0
-                                | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> }
+                                | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> > }
                            }
                            {0
-                           | 1 < Uplink RLC Entity 2 : < RLC Entity Struct>
+                           | 1 < Uplink RLC Entity 2 : < RLC Entity Struct> >
                                 {0
-                                | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> }
+                                | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> > }
                            }
                        }
                        { null | 0 bit** = < no string > -- Receiver backward compatible with earlier version
@@ -3969,9 +3996,9 @@ sub-clause 1.6.
          { 00 < DTM Handover to A/Gb Mode Payload : < DTM Handover to A/Gb mode Payload description struct > >
          | 01 < DTM Handover to UTRAN Payload : < RRC Container IE > > }
          < padding bits >
-         ! < Non-distribution part error : bit (*) = < no string > > ;
-    ! < Address information part error : bit (*) = < no string > > }
-! < Non-distribution part error : bit (*) = < no string > > ;
+         ! < Non-distribution part error : bit (*) = < no string > > }
+    ! < Address information part error : bit (*) = < no string > > ;
+-- ! < Non-distribution part error : bit (*) = < no string > > ;
 
 < DTM Handover to A/Gb mode Payload description struct > ::=
     < DTM Handover CS RR Info: < DTM Handover CS Radio Resources IE > >
