@@ -1,0 +1,592 @@
+-- 12.42
+< PS Handover Radio Resources IE > ::=
+   { 0 | 1 < Handover Reference : bit (8) > }
+   < ARFCN : bit (10) >
+   < SI : bit (2) >
+   < NCI : bit (1) >
+   < BSIC : bit (6) >
+   { 0 | 1 < CCN_ACTIVE : bit (1) > }
+   { 0 | 1 < 3G_CCN_ACTIVE : bit (1) > }
+   { 0 | 1 < CCN Support Description : < CCN Support Description struct >> }
+   < Frequency Parameters : < Frequency Parameters IE > >
+   < NETWORK_CONTROL_ORDER : bit (2) >
+   { 0 | 1 < Global Packet Timing Advance : < Global Packet Timing Advance IE > >
+        { 0 | 1 < Packet Extended Timing Advance : bit (2) > } }                    -- Only used in uplink
+   < EXTENDED_DYNAMIC_ALLOCATION : bit (1) >                                        -- Only used in uplink
+   < RLC_RESET : bit (1) >
+   { 0 | 1 < P0 : bit (4) >
+        < PR_MODE : bit (1) > }
+   { 0 | 1 < Uplink Control Timeslot : bit (3) > }
+   { 0 < GPRS mode : < GPRS mode struct > >
+    | 1 < EGPRS mode : < EGPRS mode struct > > } ;
+
+< CCN Support Description struct > ::=
+   < Number_Cells : bit (7) >
+   { <CCN_SUPPORTED : bit> } * (val(Number_Cells)) ;
+
+< GPRS mode struct > ::=
+   -- Uplink TBFs
+   { { 0 | 1 < CHANNEL_CODING_COMMAND : bit (2) > }
+        { 0 | 1 < Global Timeslot description : < Timeslot description struct > >
+            { 1 < Uplink Assignment : < Uplink TBF Assignment struct > > } ** 0 }
+   -- Downlink TBFs
+        { 1 < Downlink Assignment : < Downlink Assignment struct > > } ** 0 } ;
+
+< EGPRS mode struct > ::=
+   -- Uplink TBFs
+   { { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+        { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+        { 0 | 1 < BEP_PERIOD2 : bit(4) > }
+        { 0 | 1 < Global Timeslot description : < Timeslot description struct > >
+            { 1 < Uplink Assignment : < Uplink TBF Assignment struct > > } ** 0 } }
+   -- Downlink TBFs
+   {0|1
+        { 0 | 1 { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+            < LINK_QUALITY_MEASUREMENT_MODE : bit (2) >
+            { 0 | 1 < BEP_PERIOD2 : bit(4) > } }
+            { 1 < Downlink Assignment : < Downlink Assignment struct > > } ** 0 } ;
+
+< Uplink TBF Assignment struct > ::=                   -- Recursive for multiple TBFs
+    { 0 | 1 < PFI : bit (7) > }
+    < RLC_MODE : bit (1) >
+    < TFI Assignment : bit (5) >
+    { 0 | 1 < CHANNEL_CODING_COMMAND : bit (2) > }
+    { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+    { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+    < USF_GRANULARITY : bit (1) >
+    {0                                                 -- The timeslots assigned to the TBF are all the timeslots assigned
+                                                       -- in the Global Timeslot description
+    | 1 < TBF_TIMESLOT_ALLOCATION : bit (N) > }             -- The timeslots assigned to the TBF are a subset of all the
+                                                            -- timeslots assigned in the Global Timeslot description. Where
+                                                            -- N is the number of timeslots assigned to the MS in the Global
+                                                            -- Timeslot description
+    {0       < USF_ALLOCATION : bit (3) >              -- The same USF is valid on all timeslots assigned to the TBF
+    |1                                                 -- Different USF(s) assigned
+             < USF_ALLOCATION : bit (3) >                        -- USF assignment on the lowest numbered timeslot
+                                                                 -- assigned to the TBF
+             { 0 | 1 < USF_ALLOCATION : bit (3) > } * (M-1) } ;      -- USFs on subsequent timeslots assigned to the TBF:
+                                                                     -- A "0" (respectively a "1" followed by a USF value)
+                                                                     -- means same (respectively different) USF value as the
+                                                                     -- USF on the next lower numbered timeslot assigned to
+                                                                     -- the TBF. Where M is the amount of timeslots assigned
+                                                                     -- to the TBF in the TBF_TIMESLOT_ALLOCATION if
+                                                                     -- present, else in the Global Timeslot description.
+
+< Downlink Assignment struct > ::=      -- Recursive for multiple TBFs
+    < TIMESLOT_ALLOCATION : bit (8) >
+    { < Downlink TBF assignment : < Downlink TBF assignment struct > > } ;
+
+< Downlink TBF assignment struct > ::=
+{ 0 | 1 < PFI : bit (7) > }
+    < RLC_MODE : bit (1) >
+    < TFI Assignment : bit (5) >
+    < CONTROL_ACK : bit (1) >
+    { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > } ;
+
+< Timeslot description struct > ::=
+    {0                                                 -- without power control params
+         < MS_TIMESLOT_ALLOCATION : bit (8) >
+    |1                                                 -- with power control params
+         < ALPHA : bit (4) >
+         { 0 | 1 < GAMMA_TN0 : bit (5) > }
+         { 0 | 1 < GAMMA_TN1 : bit (5) > }
+         { 0 | 1 < GAMMA_TN2 : bit (5) > }
+         { 0 | 1 < GAMMA_TN3 : bit (5) > }
+         { 0 | 1 < GAMMA_TN4 : bit (5) > }
+         { 0 | 1 < GAMMA_TN5 : bit (5) > }
+         { 0 | 1 < GAMMA_TN6 : bit (5) > }
+         { 0 | 1 < GAMMA_TN7 : bit (5) > } } ;
+
+-- 12.42a
+< PS Handover Radio Resources 2 IE > ::=
+   { 0 | 1 < Handover Reference : bit (8) > }
+   < ARFCN : bit (10) >
+   < SI : bit (2) >
+   < NCI : bit (1) >
+   < BSIC : bit (6) >
+   { 0 | 1 < CCN_ACTIVE : bit (1) > }
+   { 0 | 1 < 3G_CCN_ACTIVE : bit (1) > }
+   { 0 | 1 < CCN Support Description : < CCN Support Description struct >> }
+   { 01          -- Legacy IEs used
+        < Frequency Parameters C1 : < Frequency Parameters IE > >
+        { 0 | 1 < Frequency Parameters C2 : < Frequency Parameters IE > > }
+   | 10          -- Optimized Dual Carrier frequency parameters used
+        < Dual Carrier Frequency Parameters: < Dual Carrier Frequency Parameters IE > >
+   ! < Frequency Parameters error: { 00 | 11 } bit(*) = < no string> > } -- reserved for future use
+   < NETWORK_CONTROL_ORDER : bit (2) >
+   { 0 | 1 < Global Packet Timing Advance : < Global Packet Timing Advance IE > >
+        { 0 | 1 < Packet Extended Timing Advance : bit (2) > } }                          -- Only used in uplink
+   < RLC_RESET : bit (1) >
+   < Uplink EGPRS Level: < EGPRS Level IE > >
+   { 0 | 1 < Downlink EGPRS Level: < EGPRS Level IE > > }
+   { 0 | 1 < Pulse Format: < Pulse Format IE > > }
+   < EGPRS mode : < EGPRS mode struct > >
+   -- Optional extension information:
+   { 0 | 1 < Extension Length : bit (6) >
+            { < bit (val(Extension Length) + 1) >
+              & <Extension Information > } ! { bit ** = <no string> } } ;
+
+< CCN Support Description struct > ::=
+   < Number_Cells : bit (7) >
+   { < CCN_SUPPORTED : bit > } * (val(Number_Cells)) ;
+
+< EGPRS mode struct > ::=
+   -- Uplink TBFs
+   { { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+        { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+       { 0 | 1 < BEP_PERIOD2 : bit(4) > }
+       { 0 | 1 < Global Timeslot description : < Dual Carrier Timeslot description struct > >
+            { 1 < Multiple Uplink Assignment : < Multiple Uplink Assignment 2 struct > > } } }
+   -- Downlink TBFs
+   {0|1
+       { 0 | 1 { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+            < LINK_QUALITY_MEASUREMENT_MODE : bit (2) >
+            { 0 | 1 < BEP_PERIOD2 : bit(4) > } }
+       {0|1                -- BTTI mode
+            < FANR: bit (1) >
+            { 1 < BTTI Multiple Downlink Assignment : < BTTI Multiple Downlink Assignment struct > > } ** 0
+       }
+       {0|1                -- RTTI mode
+            {0                 -- Single Carrier Assignment
+                { 00               -- Default PDCH-pair configuration
+                | 01               -- Unchanged
+                | 10               -- Explicit PDCH pair configuration
+                     < DOWNLINK_PDCH_PAIRS_C1 : bit (8) >
+                     < UPLINK_PDCH_PAIRS_C1 : bit (8) >
+                ! < PDCH pairs configuration error : { 1 1 } bit (*) = < no string > > -- reserved
+                }
+                { 1 < RTTI Multiple Downlink Assignment SC :
+                     < RTTI Multiple Downlink Assignment SC struct > > } ** 0
+            |1                 -- Dual Carrier Assignment
+                { 00               -- Default PDCH pair configuration
+                | 01               -- Unchanged
+                | 10               -- Explicit PDCH pair configuration
+                     < DOWNLINK_PDCH_PAIRS_C1 : bit (8) >
+                     < DOWNLINK_PDCH_PAIRS_C2 : bit (8) >
+                     < UPLINK_PDCH_PAIRS_C1 : bit (8) >
+                     < UPLINK_PDCH_PAIRS_C2 : bit (8) >
+                ! < PDCH pairs configuration error : { 1 1 } bit (*) = < no string > > -- reserved
+                }
+                { 1 < RTTI Multiple Downlink Assignment DC :
+                     < RTTI Multiple Downlink Assignment DC struct > > } ** 0
+            }
+        }
+   };
+
+< BTTI Multiple Downlink Assignment struct > ::=
+   { 0 | 1 < TIMESLOT_ALLOCATION_C1 : bit (8) > }
+   { 0 | 1 < TIMESLOT_ALLOCATION_C2 : bit (8) > }
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+   { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+
+< RTTI Multiple Downlink Assignment SC struct > ::=
+   < RTTI_DOWNLINK_PDCH_PAIR_ASSIGNMENT_SC : bit (4) >
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+
+< RTTI Multiple Downlink Assignment DC struct > ::=
+   < RTTI_DOWNLINK_PDCH_PAIR_ASSIGNMENT_DC : bit (8) >
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+   { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+
+< Downlink TBF assignment 2 struct > ::=
+   { 0 | 1< PFI : bit (7) > }
+   < RLC_MODE : bit (1) >
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+   < TFI Assignment : bit (5) >
+   < CONTROL_ACK : bit (1) >
+   { 0 | 1 < NPM Transfer Time : bit (5) > }
+   < EVENT_BASED_FANR: bit (1) >
+   { 0 | 1 < Downlink EGPRS Window Size : < EGPRS Window Size IE > > } ;
+
+< Multiple Uplink Assignment 2 struct > ::=
+   < EXTENDED_DYNAMIC_ALLOCATION : bit (1) >
+   { 0 | 1 < P0_C1 : bit (4) >
+            < PR_MODE_C1 : bit(1) >
+            { 0 | 1 < P0_C2 : bit (4) >
+                      < PR_MODE_C2 : bit(1) > } }
+   { 0 | 1 -- '1' indicates that FANR is activated
+        {0       -- SSN-based encoding is selected
+        |1       -- Time-based encoding is selected
+            < TSH : bit (2) > } }
+   {0|1
+        {0|1                   -- BTTI mode
+            < Global Timeslot description : < Timeslot description 2 struct > >
+            { 1 < Uplink TBF Assignment : < Uplink TBF Assignment 2 struct > > } ** 0
+        }
+        {0|1                   -- RTTI mode
+            { 0 | 1 < Uplink Assignment PDCH Pairs Description : < PDCH Pairs Description IE > > }
+            {0                     -- without power control parameters
+            |1                     -- with power control parameters
+                 < ALPHA_C1 : bit (4) >
+                 { 0 | 1 < ALPHA_C2 : bit (4) > }
+                 < N_PAIRS : bit (3) >
+                 { 0 | 1 < GAMMA : bit (5) > } * (val(N_PAIRS) + 1)
+                 {0       -- RTTI USF, or no second GAMMA values are given in case of RTTI mode with BTTI USF
+                 |1       -- Second GAMMA values are given in case of RTTI mode with BTTI USF
+                      { 0 | 1 < GAMMA : bit (5) > } * (val(N_PAIRS) + 1)
+                 }
+            }
+            { 1 < Uplink TBF Assignment : < Uplink TBF Assignment 2 struct > >
+                 < RTTI_USF_MODE : bit (1) > } ** 0
+        }
+   };
+
+< Uplink TBF Assignment 2 struct > ::=                       -- Recursive for multiple TBFs
+   { 0 | 1 < PFI : bit (7) > }
+   < RLC_MODE : bit (1) >
+   < TFI Assignment : bit (5) >
+   { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+   { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+   { 0 | 1 < NPM Transfer Time : bit (5) > }
+   {0|1
+        < REPORTED TIMESLOTS_C1 : bit (8) >                       -- carrier 1 in Downlink Dual Carrier configuration
+        { 0 | 1 < REPORTED TIMESLOTS C2 : bit (8) > } -- carrier 2 in Downlink Dual Carrier configuration
+   }
+   < USF_GRANULARITY : bit (1) >
+   {0                                                        -- The timeslots assigned to the TBF are all the timeslots assigned
+                                                             -- in the Global Timeslot description
+   | 1 < TBF_TIMESLOT_ALLOCATION : bit (N) > }                    -- see description in Table 11.2.29a.2
+   {0       < USF_ALLOCATION_C1 : bit (3) >
+        { 0 | 1 < USF_ALLOCATION_C2 : bit (3) > }                   -- The same USF is valid on all timeslots assigned to the TBF
+                                                                  -- on the respective carriers
+   |1                                                        -- Different USF(s) assigned; see description in Table 11.2.29a.2
+            < USF_ALLOCATION : bit (3) >
+            { 0 | 1 < USF_ALLOCATION : bit (3) > } * (M-1) } ;
+
+< Dual Carrier Timeslot description struct > ::=
+   {0                                                   -- without power control params
+        < MS_TIMESLOT_ALLOCATION_C1 : bit (8) >
+        { 0 | 1 < MS_TIMESLOT_ALLOCATION_C2 : bit (8) > }
+   |1                                                   -- with power control params
+        < ALPHA_C1 : bit (4) >
+        { 0 | 1 < GAMMA_TN0_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN1_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN2_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN3_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN4_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN5_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN6_C1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN7_C1 : bit (5) > }
+        { 0 | 1 < ALPHA_C2 : bit (4) > }
+        { 0 | 1 < GAMMA_TN0_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN1_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN2_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN3_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN4_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN5_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN6_C2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN7_C2 : bit (5) > } } ;
+
+< Extension Information > ::=
+   -- Additions for REL-9
+   { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C1 : bit (1) > }
+   { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C2 : bit (1) > }
+   { 0 | 1 < MTTI_UPLINK_ASSIGNMENT_C1 : bit(1) > }
+   { 0 | 1 < MTTI_UPLINK_ASSIGNMENT_C2 : bit(1) > }
+   < spare bit > ** // ;         -- Extension information may be truncated between released versions of the protocol.
+                                 -- The receiver shall assume the value zero for any truncated bit.
+
+
+-- 12.46
+< DTM Handover PS Radio Resources IE > ::=
+   < Cell Identification : < Cell Identification IE > >                                      --- provided by SI/PSI for PS HO
+   < MAX_LAPDm : bit (3) >                                                                   --- needed for DTM in new cell
+   < GPRS_MS_TXPWR_MAX_CCH : bit (5) >                                                       --- needed for DTM in new cell
+   < GPRS Cell Options : < GPRS Cell Options IE > >                                          --- provided by SI/PSI for PS HO
+   < GPRS Power Control Parameters : < GPRS Power Control Parameters IE > > --- provided by SI/PSIfor PS HO
+   < EXTENDED_DYNAMIC_ALLOCATION : bit (1) >                                                 --- only used in uplink
+   < RLC_RESET : bit (1) >
+   { 0 | 1 < P0 : bit (4) >
+            < PR_MODE : bit (1) > }
+   { 0 | 1 < Uplink Control Timeslot : bit (3) > }
+   { 0 < GPRS mode : GPRS mode struct >
+        | 1 < EGPRS mode : EGPRS mode struct > }
+   < padding bits > ;                                        -- truncation at end of message allowed, bits '0' assumed
+
+< GPRS mode struct > ::=
+   -- Uplink TBFs
+   { { 0 | 1 < CHANNEL_CODING_COMMAND : bit (2) > }
+        { 0 | 1 < Global Timeslot description : < Timeslot description struct > >
+            { 1 < Uplink Assignment : < Uplink TBF Assignment struct > > } ** 0 }
+   -- Downlink TBFs
+        { 1 < Downlink Assignment : < Downlink Assignment struct > > } ** 0 } ;
+
+< EGPRS mode struct > ::=
+   -- Uplink TBFs
+   { { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+        { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+        { 0 | 1 < BEP_PERIOD2 : bit(4) > }
+        { 0 | 1 < Global Timeslot description : < Timeslot description struct > >
+            { 1 < Uplink Assignment : < Uplink TBF Assignment struct > > } ** 0 } }
+   -- Downlink TBFs
+   {0|1
+        { 0 | 1 { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+            < LINK_QUALITY_MEASUREMENT_MODE : bit (2) >
+            { 0 | 1 < BEP_PERIOD2 : bit(4) > } }
+            { 1 < Downlink Assignment : < Downlink Assignment struct > > } ** 0 } ;
+
+< Uplink TBF Assignment struct > ::=                    -- Recursive for multiple TBFs
+   { 0 | 1 < PFI : bit (7) > }
+   < RLC_MODE : bit (1) >
+   < TFI Assignment : bit (5) >
+   { 0 | 1 < CHANNEL_CODING_COMMAND : bit (2) > }
+   { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+   { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+   < USF_GRANULARITY : bit (1) >
+   {0                                                   -- The timeslots assigned to the TBF are all the timeslots assigned
+                                                        -- in the Global Timeslot description
+   | 1 < TBF_TIMESLOT_ALLOCATION : bit (N) > }               -- The timeslots assigned to the TBF are a subset of all the
+                                                             -- timeslots assigned in the Global Timeslot description. Where
+                                                             -- N is the number of timeslots assigned to the MS in the Global
+                                                             -- Timeslot description
+   {0       < USF_ALLOCATION : bit (3) >                -- The same USF is valid on all timeslots assigned to the TBF
+   |1                                                   -- Different USF(s) assigned
+            < USF_ALLOCATION : bit (3) >                          -- USF assignment on the lowest numbered timeslot
+                                                                  -- assigned to the TBF
+            { 0 | 1 < USF_ALLOCATION : bit (3) > } * (M-1) } ;        -- USFs on subsequent timeslots assigned to the TBF:
+                                                                      -- A "0" (respectively a "1" followed by a USF value)
+                                                                      -- means same (respectively different) USF value as the
+                                                                      -- USF on the next lower numbered timeslot assigned to
+                                                                      -- the TBF. Where M is the amount of timeslots assigned
+                                                                      -- to the TBF in the TBF_TIMESLOT_ALLOCATION if
+                                                                      -- present, else in the Global Timeslot description.
+
+< Downlink Assignment struct > ::=               -- Recursive for multiple TBFs
+   < TIMESLOT_ALLOCATION : bit (8) >
+   { < Downlink TBF assignment : < Downlink TBF assignment struct > > } ;
+
+< Downlink TBF assignment struct > ::=
+   { 0 | 1 < PFI : bit (7) > }
+   < RLC_MODE : bit (1) >
+   < TFI Assignment : bit (5) >
+   < CONTROL_ACK : bit (1) >
+   { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > } ;
+
+< Timeslot description struct > ::=
+   {0                                           -- without power control params
+        < MS_TIMESLOT_ALLOCATION : bit (8) >
+   |1                                           -- with power control params
+        < ALPHA : bit (4) >
+        { 0 | 1 < GAMMA_TN0 : bit (5) > }
+        { 0 | 1 < GAMMA_TN1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN3 : bit (5) > }
+        { 0 | 1 < GAMMA_TN4 : bit (5) > }
+        { 0 | 1 < GAMMA_TN5 : bit (5) > }
+        { 0 | 1 < GAMMA_TN6 : bit (5) > }
+        { 0 | 1 < GAMMA_TN7 : bit (5) > } } ;
+
+-- 12.48
+< PS Radio Resources 2 IE > ::=
+   < Cell Identification : < Cell Identification IE > >                                    --- provided by SI/PSI for PS HO
+   < MAX_LAPDm : bit (3) >                                                                 --- needed for DTM in new cell
+   < GPRS_MS_TXPWR_MAX_CCH : bit (5) >                                                     --- needed for DTM in new cell
+   < GPRS Cell Options : < GPRS Cell Options IE > >                                        --- provided by SI/PSI for PS HO
+   < GPRS Power Control Parameters : < GPRS Power Control Parameters IE > > --- provided by SI/PSI for PS HO
+   < RLC_RESET : bit (1) >
+   { 00 < EGPRS mode : < EGPRS mode struct > >
+   ! < TBF mode error: { 01 | 10 | 11 } bit(*) = < no string> > } -- reserved for future use
+   -- Optional extension information:
+   { 0 | 1 < Extension Length : bit (6) >
+            { < bit (val(Extension Length) + 1) >
+              & <Extension Information > } ! { bit ** = <no string> } } ;
+
+< EGPRS mode struct > ::=
+   -- Uplink TBFs
+   { { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+        { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+       { 0 | 1 < BEP_PERIOD2 : bit(4) > }
+       { 0 | 1 < Global Timeslot description : < Timeslot description struct > >
+       < Uplink EGPRS Level: < EGPRS Level IE > >
+       { 0 | 1 < Pulse Format: < Pulse Format IE > > }
+            { 1 < Multiple Uplink Assignment : < Multiple Uplink Assignment 2 struct > > } } }
+   -- Downlink TBFs
+   {0|1
+       { 0 | 1 { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+            < LINK_QUALITY_MEASUREMENT_MODE : bit (2) >
+            { 0 | 1 < BEP_PERIOD2 : bit(4) > } }
+       < Downlink EGPRS Level: < EGPRS Level IE > >
+       {0 |1               -- BTTI mode
+            < FANR: bit (1) >
+            { 1 < BTTI Multiple Downlink Assignment : < BTTI Multiple Downlink Assignment struct > > } ** 0
+       }
+       {0|1                -- RTTI mode
+            {0                 -- Single Carrier Assignment
+                { 00               -- Default PDCH-pair configuration
+                | 01               -- Unchanged
+                | 10               -- Explicit PDCH pair configuration
+                     < DOWNLINK_PDCH_PAIRS_C1 : bit (8) >
+                     < UPLINK_PDCH_PAIRS_C1 : bit (8) >
+                ! < PDCH pairs configuration error : { 1 1 } bit (*) = < no string > >     -- reserved
+                }
+                { 1 < RTTI Multiple Downlink Assignment SC :
+                     < RTTI Multiple Downlink Assignment SC struct > > } ** 0
+            |1                 -- Dual Carrier Assignment
+                { 00               -- Default PDCH pair configuration
+                | 01               -- Unchanged
+                | 10               -- Explicit PDCH pair configuration
+                     < DOWNLINK_PDCH_PAIRS_C1 : bit (8) >
+                     < DOWNLINK_PDCH_PAIRS_C2 : bit (8) >
+                     < UPLINK_PDCH_PAIRS_C1 : bit (8) >
+                     < UPLINK_PDCH_PAIRS_C2 : bit (8) >
+                ! < PDCH pairs configuration error : { 1 1 } bit (*) = < no string > >     -- reserved
+                }
+                { 1 < RTTI Multiple Downlink Assignment DC :
+                     < RTTI Multiple Downlink Assignment DC struct > > } ** 0
+            }
+        }
+   };
+
+< BTTI Multiple Downlink Assignment struct > ::=
+   { 0 | 1 < TIMESLOT_ALLOCATION_C1 : bit (8) > }
+   { 0 | 1 < TIMESLOT_ALLOCATION_C2 : bit (8) > }
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+   { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+
+< RTTI Multiple Downlink Assignment SC struct > ::=
+   < RTTI_DOWNLINK_PDCH_PAIR_ASSIGNMENT_SC : bit (4) >
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+
+< RTTI Multiple Downlink Assignment DC struct > ::=
+    < RTTI_DOWNLINK_PDCH_PAIR_ASSIGNMENT_DC : bit (8) >
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+   { 1 < Downlink TBF assignment : < Downlink TBF assignment 2 struct > > } ** 0 ;
+
+< Downlink TBF assignment 2 struct > ::=
+   { 0 | 1< PFI : bit (7) > }
+   < RLC_MODE : bit (1) >
+   { 0 | 1 < Uplink Control Timeslot C1 : bit (3) > }
+   { 0 | 1 < Uplink Control Timeslot C2 : bit (3) > }
+   < TFI Assignment : bit (5) >
+   < CONTROL_ACK : bit (1) >
+   { 0 | 1 < NPM Transfer Time : bit (5) > }
+   < EVENT_BASED_FANR: bit (1) >
+   { 0 | 1 < Downlink EGPRS Window Size : < EGPRS Window Size IE > > } ;
+
+< Multiple Uplink Assignment 2 struct > ::=
+   < EXTENDED_DYNAMIC_ALLOCATION : bit (1) >
+   { 0 | 1 < P0_C1 : bit (4) >
+            < PR_MODE_C1 : bit(1) >
+            { 0 | 1 < P0_C2 : bit (4) >
+                     < PR_MODE_C2 : bit(1) > } }
+   { 0 | 1 -- '1' indicates that FANR is activated
+        {0      -- SSN-based encoding is selected
+        |1      -- Time-based encoding is selected
+            < TSH : bit (2) > } }
+   {0|1
+        {0|1                  -- BTTI mode
+            < Global Timeslot description : < Timeslot description 2 struct > >
+            { 1 < Uplink TBF Assignment : < Uplink TBF Assignment 2 struct > > } ** 0
+        }
+        {0|1                  -- RTTI mode
+            { 0 | 1 < Uplink Assignment PDCH Pairs Description : < PDCH Pairs Description IE > > }
+            {0                    -- without power control parameters
+            |1                    -- with power control parameters
+                < ALPHA_C1 : bit (4) >
+                { 0 | 1 < ALPHA_C2 : bit (4) > }
+                < N_PAIRS : bit (3) >
+                { 0 | 1 < GAMMA : bit (5) > } * (val(N_PAIRS) + 1)
+                {0       -- RTTI USF, or no second GAMMA values are given in case of RTTI mode with BTTI USF
+                |1       -- Second GAMMA values are given in case of RTTI mode with BTTI USF
+                     { 0 | 1 < GAMMA : bit (5) > } * (val(N_PAIRS) + 1)
+                }
+            }
+            { 1 < Uplink TBF Assignment : < Uplink TBF Assignment 2 struct > >
+                < RTTI_USF_MODE : bit (1) > } ** 0
+        }
+   };
+
+< Uplink TBF Assignment 2 struct > ::=               -- Recursive for multiple TBFs
+   { 0 | 1 < PFI : bit (7) > }
+   < RLC_MODE : bit (1) >
+   < TFI Assignment : bit (5) >
+   { 0 | 1 < EGPRS Channel Coding Command : < EGPRS Modulation and Coding Scheme IE > > }
+   { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+   { 0 | 1 < NPM Transfer Time : bit (5) > }
+   {0|1
+            < REPORTED TIMESLOTS_C1 : bit (8) >               -- carrier 1 in Downlink Dual Carrier configuration
+            { 0 | 1 < REPORTED TIMESLOTS C2 : bit (8) > } -- carrier 2 in Downlink Dual Carrier configuration
+   }
+   < USF_GRANULARITY : bit (1) >
+   {0                                                -- The timeslots assigned to the TBF are all the timeslots assigned
+                                                     -- in the Global Timeslot description
+   | 1 < TBF_TIMESLOT_ALLOCATION : bit (N) > }            -- see description in Table 11.2.29a.2
+   { 0 < USF_ALLOCATION_C1 : bit (3) >
+        { 0 | 1 < USF_ALLOCATION_C2 : bit (3) > }    -- The same USF is valid on all timeslots assigned to the TBF
+                                                          -- on the respective carriers
+   |1                                                -- Different USF(s) assigned; see description in Table 11.2.29a.2
+        < USF_ALLOCATION : bit (3) >
+        { 0 | 1 < USF_ALLOCATION : bit (3) > } * (M-1)
+   };
+
+< Timeslot description struct > ::=
+   {0                                                -- without power control params
+        < MS_TIMESLOT_ALLOCATION : bit (8) >
+   |1                                             -- with power control params
+        < ALPHA : bit (4) >
+        { 0 | 1 < GAMMA_TN0 : bit (5) > }
+        { 0 | 1 < GAMMA_TN1 : bit (5) > }
+        { 0 | 1 < GAMMA_TN2 : bit (5) > }
+        { 0 | 1 < GAMMA_TN3 : bit (5) > }
+        { 0 | 1 < GAMMA_TN4 : bit (5) > }
+        { 0 | 1 < GAMMA_TN5 : bit (5) > }
+        { 0 | 1 < GAMMA_TN6 : bit (5) > }
+        { 0 | 1 < GAMMA_TN7 : bit (5) > }
+   };
+
+< Extension Information > ::=
+   {{       -- Rel-9 extension:
+        { 0 < EMST_NW_Capability : bit (1) >           -- EMST is not used
+        |1                                             -- EMST is used
+            {0
+            | 1 < Downlink RLC Entity 2 : < RLC Entity Struct> >
+                {0
+                | 1 < Downlink RLC Entity 3 : < RLC Entity Struct> > }
+            }
+            {0
+            | 1 < Uplink RLC Entity 2 : < RLC Entity Struct> >
+                {0
+                | 1 < Uplink RLC Entity 3 : < RLC Entity Struct> > }
+            }
+        }
+   }
+   { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C1 : bit (1) > }
+   { 0 | 1 < MTTI_DOWNLINK_ASSIGNMENT_C2 : bit (1) > }
+   { 0 | 1 < MTTI_UPLINK_ASSIGNMENT_C1 : bit(1) > }
+   { 0 | 1 < MTTI_UPLINK_ASSIGNMENT_C2 : bit(1) > }
+   { null | 0 bit** = < no string > -- Receiver backward compatible with earlier version
+   |1                               -- Additions for Rel-10
+        {0      -- EMSR is not enabled in downlink
+        |1      -- EMSR is enabled in downlink
+            { 1 < EMSR Additional PFCs 1 : < Additional PFCs struct > > } ** 0
+            { 1 < EMSR Additional PFCs 2 : < Additional PFCs struct > > } ** 0
+            { 1 < EMSR Additional PFCs 3 : < Additional PFCs struct > > } ** 0
+        }
+        {0      -- EMSR is not enabled in uplink
+        |1      -- EMSR is enabled in uplink
+            { 1 < EMSR Additional PFCs 1 : < Additional PFCs struct > > } ** 0
+            { 1 < EMSR Additional PFCs 2 : < Additional PFCs struct > > } ** 0
+            { 1 < EMSR Additional PFCs 3 : < Additional PFCs struct > > } ** 0
+        }
+< spare bit > ** } } // ;       -- Extension information may be truncated between released versions of the protocol.
+                                    -- The receiver shall assume the value zero for any truncated bit.
+
+< RLC Entity Struct > ::=
+   < TFI : bit (5) >
+   < RLC_MODE : bit (1) >
+   { 0 | 1 < EGPRS Window Size : < EGPRS Window Size IE > > }
+   < PFI : bit (7) >;
+
+< Additional PFCs struct > ::=
+   < TFI : bit (5) >
+    { 0 | 1 < NPM Transfer Time : bit (5) > }
+   < PFI : bit (7) >;
+
+
