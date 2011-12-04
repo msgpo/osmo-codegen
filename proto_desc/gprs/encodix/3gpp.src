@@ -10,4 +10,5 @@ csn.1 {
 	<no string> ::= null;
 	<padding bits> ::= <bit>**;
 	slave <A5 bits> ::= <A5/7: bit> <A5/6: bit> <A5/5: bit> <A5/4: bit>;
+	< reserved > ::= bit (*);
 }
