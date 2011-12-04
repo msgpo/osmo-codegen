@@ -2288,7 +2288,7 @@ slave < GRA ID struct > ::=
 
 
 -- 11.2.28b
-< Packet DBPSCH Uplink Ack/Nack message content > ::=
+< Packet DBPSCH Uplink Ack/Nack message 2 content > ::=
    { < MESSAGE_TYPE : bit (6) == 001001 > -- The same message type as for Packet DBPSCH Uplink Ack/Nack is
                                                 -- used since these two messages are mutually exclusive.
       < RB Id : bit (5) >
