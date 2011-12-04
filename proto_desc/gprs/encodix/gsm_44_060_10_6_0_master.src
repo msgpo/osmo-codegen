@@ -109,13 +109,13 @@ gsm-0460 Packet_Serving_Cell_Data {
 gsm-0460 Packet_DBPSCH_Assignment {
 	in message set Downlink_RLC_MAC;
 	MessageType = 001110;
-	contents M V >=0 Packet_DBPSCH_Assingment_message_content;
+	contents M V >=0 Packet_DBPSCH_Assignment_message_content;
 }
 
 gsm-0460 Multiple_TBF_Downlink_Assignment {
 	in message set Downlink_RLC_MAC;
 	MessageType = 001111;
-	contents M V >=0 Multiple_TBF_Downlink_Assingment_message_content;
+	contents M V >=0 Multiple_TBF_Downlink_Assignment_message_content;
 }
 
 -- gsm-0460 Multiple_TBF_Uplink_Assignment {
@@ -133,10 +133,10 @@ gsm-0460 MBMS_Assignment_Non_distribution {
 	contents M V >=0 MBMS_Assignment_Non_distribution_message_content;
 }
 
-gsm-0460 Packet_Physical_Information {
+gsm-0460 Packet_Physical_information {
 	in message set Downlink_RLC_MAC;
 	MessageType = 010110;
-	contents M V >=0 Packet_Physical_Information_message_content;
+	contents M V >=0 Packet_Physical_information_message_content;
 }
 
 gsm-0460 Packet_Downlink_Dummy_Control_Block {
@@ -201,12 +201,12 @@ gsm-0460 PSI14 {
 	contents M V >=0 PSI14_message_content;
 }
 
--- gsm-0460 PSI13_ter {
+-- gsm-0460 PSI3_ter {
 
-gsm-0460 PSI13_quater {
+gsm-0460 PSI3_quater {
 	in message set Downlink_RLC_MAC;
 	MessageType = 111101;
-	contents M V >=0 PSI13_quater_message_content;
+	contents M V >=0 PSI3_quater_message_content;
 }
 
 gsm-0460 PSI15 {
@@ -224,7 +224,7 @@ gsm-0460 PSI16 {
 gsm-0460 Packet_Serving_Cell_SI {
 	in message set Downlink_RLC_MAC;
 	MessageType = 100000;
-	contents M V >=0 Packet_Serving_Cell_message_content;
+	contents M V >=0 Packet_Serving_Cell_SI_message_content;
 }
 
 gsm-0460 Packet_CS_Command {
@@ -250,7 +250,7 @@ gsm-0460 MBMS_Neighbouring_Cell_Information {
 gsm-0460 Packet_MBMS_Announcement {
 	in message set Downlink_RLC_MAC;
 	MessageType = 101100;
-	contents M V >=0 Packet_MBMS_Announcement_message_content;
+	contents M V >=0 PACKET_MBMS_ANNOUNCEMENT_message_content;
 }
 
 gsm-0460 Packet_Application_Information {
